@@ -771,12 +771,12 @@ a:hover {
 .tap-icon-checked {
   font-size: 1.5rem;
   flex-shrink: 0;
-  color: var(--text-light);
+  color: #ff0000;
 }
 
 .tap-icon-checked {
   display: none;
-  color: var(--primary);
+  color: #ff0000;
 }
 
 .tap-label {
@@ -961,7 +961,7 @@ a:hover {
   justify-content: center;
   margin: 0 auto var(--space-md);
   background: var(--primary-light);
-  color: var(--primary);
+  color: #ff0000;
   border-radius: var(--radius-lg);
   font-size: 1.5rem;
 }
