@@ -1,18 +1,40 @@
-# Static Site Generator Configuration
-# This file is optional but helps with edge cases on GitHub Pages
+# GitHub Pages Jekyll Configuration
+# Optimized for PWA offline-first deployment
 
-# Exclude these files/folders from deployment
+# Build settings
+markdown: kramdown
+theme: null
+remote_theme: null
+
+# Exclude these files/folders from site generation
 exclude:
   - node_modules
   - .git
   - .gitignore
   - .DS_Store
   - *.swp
-  - GITHUB_PAGES_SETUP.md
-  - OFFLINE_CHANGES.md
+  - *.md
+  - Gemfile
+  - Gemfile.lock
 
-# Enable HTTPS
-https: true
+# Include everything else (important for PWA assets)
+include:
+  - assets
+  - vendor
+  - manifest.json
+  - sw.js
+  - app.js
 
-# Branch to deploy
-branch: main
+# Safe mode - prevents plugin execution (required for GitHub Pages)
+safe: true
+
+# Timezone (optional)
+timezone: UTC
+
+# URL settings for subdirectory deployment
+url: "https://nunyalabs.github.io"
+baseurl: "/uhas-toolkitA"
+
+# Build settings
+incremental: false
+future: false
