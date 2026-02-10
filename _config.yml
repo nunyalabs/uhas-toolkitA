@@ -1,0 +1,18 @@
+# Static Site Generator Configuration
+# This file is optional but helps with edge cases on GitHub Pages
+
+# Exclude these files/folders from deployment
+exclude:
+  - node_modules
+  - .git
+  - .gitignore
+  - .DS_Store
+  - *.swp
+  - GITHUB_PAGES_SETUP.md
+  - OFFLINE_CHANGES.md
+
+# Enable HTTPS
+https: true
+
+# Branch to deploy
+branch: main
