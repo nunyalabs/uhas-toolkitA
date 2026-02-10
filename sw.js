@@ -5,45 +5,45 @@
 
 const CACHE_VERSION = 'uhas-toolkit-a-v1';
 const CACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/app.js',
+  './',
+  './index.html',
+  './manifest.json',
+  './app.js',
 
   // CSS
-  '/assets/css/main.css',
+  './assets/css/main.css',
 
   // Images
-  '/assets/img/uhas.jpg',
-  '/assets/img/hpi.png',
+  './assets/img/uhas.jpg',
+  './assets/img/hpi.png',
 
   // Icons
-  '/assets/icons/icon-192.svg',
-  '/assets/icons/icon-512.svg',
+  './assets/icons/icon-192.svg',
+  './assets/icons/icon-512.svg',
 
   // Vendor - Bootstrap Icons
-  '/vendor/bootstrap-icons/bootstrap-icons.min.css',
-  '/vendor/bootstrap-icons/fonts/bootstrap-icons.woff',
-  '/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2',
+  './vendor/bootstrap-icons/bootstrap-icons.min.css',
+  './vendor/bootstrap-icons/fonts/bootstrap-icons.woff',
+  './vendor/bootstrap-icons/fonts/bootstrap-icons.woff2',
 
   // Vendor - Fonts
-  '/vendor/fonts/space-grotesk.css',
-  '/vendor/fonts/SpaceGrotesk-400.ttf',
-  '/vendor/fonts/SpaceGrotesk-500.ttf',
-  '/vendor/fonts/SpaceGrotesk-600.ttf',
-  '/vendor/fonts/SpaceGrotesk-700.ttf',
+  './vendor/fonts/space-grotesk.css',
+  './vendor/fonts/SpaceGrotesk-400.ttf',
+  './vendor/fonts/SpaceGrotesk-500.ttf',
+  './vendor/fonts/SpaceGrotesk-600.ttf',
+  './vendor/fonts/SpaceGrotesk-700.ttf',
 
   // Vendor - Bootstrap & Tailwind CSS (no external dependencies)
-  '/vendor/bootstrap/bootstrap.bundle.min.js',
-  '/vendor/bootstrap/bootstrap.min.css',
-  '/vendor/tailwind/tailwind.min.css',
+  './vendor/bootstrap/bootstrap.bundle.min.js',
+  './vendor/bootstrap/bootstrap.min.css',
+  './vendor/tailwind/tailwind.min.css',
 
   // Scripts - Core IndexedDB & Import/Export
-  '/assets/js/idb-manager.js',
-  '/assets/js/import-export.js',
-  '/assets/js/config.js',
-  '/assets/js/participant.js',
-  '/assets/js/sw-updater.js'
+  './assets/js/idb-manager.js',
+  './assets/js/import-export.js',
+  './assets/js/config.js',
+  './assets/js/participant.js',
+  './assets/js/sw-updater.js'
 ];
 
 // Install event - cache essential assets
@@ -155,7 +155,9 @@ self.addEventListener('fetch', event => {
           .catch(() => {
             // Network failed and not in cache - return offline fallback for HTML
             if (event.request.headers.get('accept')?.includes('text/html')) {
-              return caches.match('/index.html');
+              return caches.match('./index.html').then(response => {
+                return response || caches.match('./');
+              });
             }
             // For other assets, return a simple offline response
             return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });

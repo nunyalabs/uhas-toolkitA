@@ -12,13 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../../assets/css/main.css">
-  <link rel="stylesheet" href="../../vendor/bootstrap-icons/bootstrap-icons.min.css">
-  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="./assets/css/main.css">
+  <link rel="stylesheet" href="./vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="manifest" href="./manifest.json">
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="apple-touch-icon" href="../../assets/icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.svg">
 
   <style>
     /* Toolkit-specific styles */
@@ -736,10 +736,10 @@
   <header class="app-header">
     <div class="container">
       <div class="brand">
-        <a href="../../" style="display: flex; align-items: center; gap: 0.5rem;">
-          <img src="../../assets/img/uhas.jpg" alt="UHAS" class="brand-logo">
+        <a href="./" style="display: flex; align-items: center; gap: 0.5rem;">
+          <img src="./assets/img/uhas.jpg" alt="UHAS" class="brand-logo">
           <span class="brand-divider"></span>
-          <img src="../../assets/img/hpi.png" alt="HPI" class="brand-logo">
+          <img src="./assets/img/hpi.png" alt="HPI" class="brand-logo">
         </a>
         <span class="brand-text">Toolkit A</span>
       </div>
@@ -753,8 +753,8 @@
           <span class="status-dot"></span>
           <span>Online</span>
         </div>
-        <a href="../" class="btn btn-outline" title="Back to Toolkit"><i class="bi bi-arrow-left"></i> Back</a>
-        <a href="../../" class="btn btn-outline" title="Home"><i class="bi bi-house-fill"></i></a>
+        <a href="#" class="btn btn-outline" title="Back" onclick="history.back()"><i class="bi bi-arrow-left"></i> Back</a>
+        <a href="./" class="btn btn-outline" title="Home"><i class="bi bi-house-fill"></i></a>
       </div>
     </div>
   </header>
@@ -851,7 +851,7 @@
           <!-- Removed Data Manager Link -->
           <!-- 
           <div class="col-6 col-md-4">
-            <a href="../" class="btn btn-outline-secondary w-100">
+            <a href="#" class="btn btn-outline-secondary w-100" onclick="history.back()">
               <i class="bi bi-database me-1"></i>Data Manager
             </a>
           </div> 
@@ -3037,18 +3037,18 @@
   </script>
 
   <!-- IndexedDB & Import/Export Management -->
-  <script src="../../assets/js/idb-manager.js"></script>
-  <script src="../../assets/js/import-export.js"></script>
+  <script src="./assets/js/idb-manager.js"></script>
+  <script src="./assets/js/import-export.js"></script>
 
   <!-- Core Database & Participant Scripts -->
-  <script src="../../assets/js/config.js"></script>
-  <script src="../../assets/js/participant.js"></script>
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/participant.js"></script>
   
   <!-- Main App Script -->
   <script src="./app.js"></script>
 
   <!-- Service Worker Auto-Updater -->
-  <script src="../../assets/js/sw-updater.js"></script>
+  <script src="./assets/js/sw-updater.js"></script>
 </body>
 
 </html>

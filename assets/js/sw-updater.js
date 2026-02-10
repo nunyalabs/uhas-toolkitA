@@ -27,7 +27,7 @@
   // Register SW and check for updates
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      const registration = await navigator.serviceWorker.register('./sw.js');
       console.log('[SW Updater] SW registered');
 
       // Check for updates immediately
