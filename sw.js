@@ -41,7 +41,6 @@ const CACHE_ASSETS = [
   // Scripts - Core IndexedDB & Import/Export
   './assets/js/idb-manager.js',
   './assets/js/import-export.js',
-  './assets/js/config.js',
   './assets/js/participant.js',
   './assets/js/sw-updater.js'
 ];
