@@ -6,7 +6,7 @@
 :root {
   /* Base Colors */
   --bg: #f4f6f8;
-  --bg-alt: #eef1f4;
+  --bg-alt: #f8f9fa;
   --surface: #ffffff;
   --surface-hover: #fafbfc;
   --surface-alt: rgba(255, 255, 255, 0.92);
@@ -75,10 +75,10 @@ html {
 body {
   margin: 0;
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--text);
-  background: var(--bg);
+  font-size: 18px;
+  line-height: 1.7;
+  color: #000000;
+  background: #ffffff;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
@@ -91,12 +91,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.125rem; }
-h5 { font-size: 1rem; }
-h6 { font-size: 0.875rem; }
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.3rem; }
+h6 { font-size: 1.1rem; }
 
 p {
   margin: 0 0 var(--space-md);
@@ -246,8 +246,8 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
+  padding: 14px 20px;
+  font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   border: none;
@@ -255,6 +255,7 @@ a:hover {
   cursor: pointer;
   transition: all var(--transition);
   text-decoration: none;
+  min-height: 52px;
 }
 
 .btn:disabled {
@@ -282,7 +283,7 @@ a:hover {
 
 .btn-outline {
   background: transparent;
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--border);
   color: var(--text-secondary);
 }
 
@@ -292,9 +293,23 @@ a:hover {
   background: var(--primary-light);
 }
 
+.btn-outline-primary {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background: var(--primary-light);
+}
+
 .btn-success {
   background: var(--success);
   color: #fff;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #0b7d45;
 }
 
 .btn-danger {
@@ -302,14 +317,38 @@ a:hover {
   color: #fff;
 }
 
+.btn-danger:hover:not(:disabled) {
+  background: #c42838;
+}
+
+.btn-info {
+  background: var(--info);
+  color: #fff;
+}
+
+.btn-info:hover:not(:disabled) {
+  background: #0b5ed7;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5c636a;
+}
+
 .btn-sm {
-  padding: 0.4rem 0.85rem;
-  font-size: 0.8rem;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  min-height: 44px;
 }
 
 .btn-lg {
-  padding: 0.85rem 1.75rem;
-  font-size: 1rem;
+  padding: 18px 28px;
+  font-size: 1.1rem;
+  min-height: 56px;
 }
 
 .btn-block {
@@ -324,8 +363,8 @@ a:hover {
 .form-label {
   display: block;
   margin-bottom: var(--space-sm);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -336,15 +375,16 @@ a:hover {
 
 .form-control {
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 14px 16px;
   font-size: 1rem;
   font-family: inherit;
   color: var(--text);
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius-md);
   outline: none;
   transition: all var(--transition);
+  min-height: 52px;
 }
 
 .form-control::placeholder {
@@ -362,21 +402,22 @@ a:hover {
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2.5rem;
+  min-height: 52px;
 }
 
 /* ============ Checkboxes & Radios ============ */
 .form-check {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   padding: var(--space-sm) 0;
 }
 
 .form-check-input {
   flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: 0.1rem;
+  width: 28px;
+  height: 28px;
+  margin-top: 0.15rem;
   background: var(--surface);
   border: 2px solid var(--border);
   border-radius: 4px;
@@ -407,10 +448,11 @@ a:hover {
 }
 
 .form-check-label {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
+  font-size: 1rem;
+  color: var(--text);
   cursor: pointer;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 /* ============ Tables ============ */

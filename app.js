@@ -30,23 +30,9 @@ async function updateDashboard() {
     const interviews = await UhasIDB.getAll('interviews');
     const audioRecordings = await UhasIDB.getAll('audioRecordings');
 
-    // Total participants
-    const totalEl = document.getElementById('totalParticipants');
-    if (totalEl) totalEl.textContent = participants.length;
-
-    // Completed interviews
-    const completedEl = document.getElementById('completedInterviews');
-    if (completedEl) {
-      const completed = interviews.filter(i => i.status === 'completed').length;
-      completedEl.textContent = completed;
-    }
-
-    // Unsynced records (all data is stored locally, show total unexported)
-    const unsyncedEl = document.getElementById('syncedCount');
-    if (unsyncedEl) {
-      const unexported = audioRecordings.filter(a => !a.exported).length;
-      unsyncedEl.textContent = unexported;
-    }
+    // Dashboard metrics removed - all info shown in Records section instead
+    // This function is kept for backwards compatibility
+    console.log('Dashboard loaded with', participants.length, 'participants');
   } catch (error) {
     console.error('Dashboard update failed:', error);
   }

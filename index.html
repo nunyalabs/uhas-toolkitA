@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./assets/css/main.css">
   <link rel="stylesheet" href="./vendor/bootstrap-icons/bootstrap-icons.min.css">
   <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/icon-192.svg">
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -349,6 +350,146 @@
       z-index: 1050;
     }
 
+    /* Records List & Cards */
+    .records-list {
+      max-height: 700px;
+      overflow-y: auto;
+    }
+
+    /* Card View */
+    .records-list.card-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-md);
+      max-height: 800px;
+    }
+
+    /* List View */
+    .records-list.list-view {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .record-item {
+      background: white;
+      border: 2px solid var(--primary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .records-list.list-view .record-item {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .record-info {
+      flex: 1;
+      margin-bottom: var(--space-sm);
+    }
+
+    .records-list.list-view .record-info {
+      margin-bottom: 0;
+    }
+
+    .record-info h6 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: var(--primary);
+    }
+
+    .record-info small {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      display: block;
+    }
+
+    .record-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .records-list.list-view .record-actions {
+      justify-content: flex-end;
+    }
+
+    .record-actions button {
+      padding: 12px 18px;
+      font-size: 1rem;
+      height: 52px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+    }
+
+    .record-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .record-info {
+      flex-grow: 1;
+    }
+
+    .record-actions {
+      display: flex;
+      gap: var(--space-xs);
+      margin-left: var(--space-md);
+    }
+
+    .record-actions .btn {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      min-width: auto;
+      flex: 1 1 calc(50% - 4px);
+      min-height: 44px;
+    }
+
+    @media (max-width: 480px) {
+      .record-actions .btn {
+        flex: 1 1 100%;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+      }
+    }
+
+    /* Scroll to Top Button */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 120px;
+      right: var(--space-lg);
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: var(--shadow-lg);
+      transition: all var(--transition);
+      z-index: 999;
+      transition: opacity 0.3s;
+    }
+
+    .scroll-to-top:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+    }
+
+    .scroll-to-top.show {
+      display: flex;
+    }
+
     .toast {
       background: var(--primary);
       color: white;
@@ -597,6 +738,48 @@
       border-radius: var(--radius-full);
     }
 
+    /* Accessibility: Touch-friendly form controls */
+    .form-control,
+    .form-select {
+      min-height: 52px;
+      font-size: 18px;
+      padding: 14px;
+      color: #000000;
+      background-color: #ffffff;
+      border: 2px solid #cccccc;
+    }
+
+    .form-label {
+      margin-bottom: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .btn {
+      min-height: 52px;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: 600;
+      touch-action: manipulation;
+    }
+
+    button, input[type="button"], input[type="submit"] {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Better radio button accessibility */
+    .btn-check {
+      margin-right: 4px;
+    }
+
+    .btn-check:focus + .btn {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
     .bg-secondary {
       background: var(--bg-alt);
     }
@@ -642,6 +825,138 @@
 
     .sync-status.offline .status-dot {
       background: var(--danger);
+    }
+
+    /* Floating Audio Recorder */
+    .floating-recorder {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      width: 320px;
+      background: white;
+      border: 3px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      display: none;
+    }
+
+    .floating-recorder.active {
+      display: block;
+    }
+
+    .floating-recorder.minimized {
+      display: none;
+    }
+
+    .floating-recorder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: var(--space-sm);
+    }
+
+    .floating-recorder-header h6 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .floating-recorder-header button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 1.8rem;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .floating-recorder-header button:hover {
+      transform: scale(1.1);
+    }
+
+    .floating-recorder-content {
+      text-align: center;
+    }
+
+    .floating-recorder-buttons {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .floating-recorder-status {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-sm);
+      min-height: 32px;
+      font-weight: 500;
+    }
+
+    .floating-recorder-player {
+      width: 100%;
+      margin-top: var(--space-sm);
+      height: 40px;
+    }
+
+    /* Minimize Button - Always Accessible */
+    .floating-recorder-minimize-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      z-index: 99;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .floating-recorder-minimize-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    .floating-recorder-minimize-btn.visible {
+      display: flex;
+    }
+
+    @media (max-width: 768px) {
+      .floating-recorder {
+        width: 100%;
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: auto;
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+      }
+
+      .floating-recorder-minimize-btn {
+        bottom: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+      }
     }
 
     /* Mobile Menu */
@@ -753,110 +1068,40 @@
 
   <!-- Main Content -->
   <main class="container" style="padding: var(--space-lg) var(--space-lg) 100px;">
-    <!-- Navigation Grid -->
-    <div class="grid mb-4">
-      <div class="nav-card active" data-target="dashboard">
-        <div class="card-icon"><i class="bi bi-speedometer2"></i></div>
-        <h3>Dashboard</h3>
-      </div>
-      <div class="nav-card" data-target="screening">
-        <div class="card-icon"><i class="bi bi-person-lines-fill"></i></div>
-        <h3>Screening & Registry</h3>
-      </div>
-      <div class="nav-card" data-target="interview">
-        <div class="card-icon"><i class="bi bi-mic"></i></div>
-        <h3>Interviews</h3>
-      </div>
-      <div class="nav-card" data-target="data">
-        <div class="card-icon"><i class="bi bi-database"></i></div>
-        <h3>Data</h3>
-      </div>
-    </div>
-
     <!-- 1. DASHBOARD SECTION -->
     <div id="dashboard" class="content-section active">
+      <!-- Study Overview Header -->
       <div class="text-center mb-4">
         <h2 class="fw-bold">Study Overview</h2>
         <p class="text-muted">Hypertension Management Digital N-of-1 Trials</p>
       </div>
 
-      <!-- Primary Metrics Row -->
-      <div class="metrics-grid mb-4">
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashTotal">0</div>
-          <div class="metric-label">Enrolled</div>
+      <!-- Navigation Grid -->
+      <div class="grid mb-4" style="grid-template-columns: 1fr;">
+        <div class="nav-card active" data-target="dashboard">
+          <div class="card-icon"><i class="bi bi-speedometer2"></i></div>
+          <h3>Dashboard</h3>
         </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number text-success" id="dashEligible">0</div>
-          <div class="metric-label">Eligible</div>
+        <div class="nav-card" data-target="screening">
+          <div class="card-icon"><i class="bi bi-person-plus-fill"></i></div>
+          <h3>Screening</h3>
         </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number text-warning" id="dashIneligible">0</div>
-          <div class="metric-label">Ineligible</div>
+        <div class="nav-card" data-target="records">
+          <div class="card-icon"><i class="bi bi-list-ul"></i></div>
+          <h3>Records</h3>
         </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashEligibilityRate">0%</div>
-          <div class="metric-label">Eligibility Rate</div>
-        </div>
-      </div>
-
-      <!-- Interview & Recording Stats Row -->
-      <div class="metrics-grid mb-4">
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashInterviews">0</div>
-          <div class="metric-label">Interviews Done</div>
-        </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashPendingIDI">0</div>
-          <div class="metric-label">Pending IDIs</div>
-        </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashAudio">0</div>
-          <div class="metric-label">Recordings</div>
-        </div>
-        <div class="content-box text-center p-3">
-          <div class="metric-number" id="dashInterviewRate">0%</div>
-          <div class="metric-label">Completion Rate</div>
-        </div>
-      </div>
-
-      <!-- Participant Distribution -->
-      <div class="content-box mb-4">
-        <h5 class="mb-4 border-bottom pb-2"><i class="bi bi-people-fill me-2"></i>Participant Distribution</h5>
-        <div class="row text-center" id="dashDistribution"></div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="content-box">
-        <h5 class="mb-3 border-bottom pb-2"><i class="bi bi-lightning-fill me-2"></i>Quick Actions</h5>
-        <div class="row g-2">
-          <div class="col-6 col-md-4">
-            <button class="btn btn-outline-primary w-100" onclick="App.switchSection('screening')">
-              <i class="bi bi-person-plus me-1"></i>Screen
-            </button>
-          </div>
-          <div class="col-6 col-md-4">
-            <button class="btn btn-outline-success w-100" onclick="App.switchSection('interview')">
-              <i class="bi bi-chat-dots me-1"></i>Interview
-            </button>
-          </div>
-          <!-- Removed Data Manager Link -->
-          <!-- 
-          <div class="col-6 col-md-4">
-            <a href="#" class="btn btn-outline-secondary w-100" onclick="history.back()">
-              <i class="bi bi-database me-1"></i>Data Manager
-            </a>
-          </div> 
-          -->
+        <div class="nav-card" data-target="interview">
+          <div class="card-icon"><i class="bi bi-mic"></i></div>
+          <h3>Interviews</h3>
         </div>
       </div>
     </div>
 
-    <!-- 2. SCREENING & REGISTRY SECTION -->
+    <!-- 2. SCREENING SECTION -->
     <div id="screening" class="content-section">
-      <div class="row g-4 centered-row">
-        <!-- LEFT COLUMN: Screening Form -->
-        <div class="col-lg-6">
+      <div class="row g-4">
+        <!-- SCREENING FORM -->
+        <div class="col-12">
           <div class="content-box">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h4 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>Participant Screening</h4>
@@ -867,60 +1112,133 @@
               <input type="hidden" id="editOriginalId" value="">
 
               <div class="row g-3">
-                <div class="col-md-6">
+                <!-- Participant Type -->
+                <div class="col-12">
                   <label class="form-label">Participant Type</label>
-                  <select class="form-control form-select" id="scrType" required>
-                    <option value="">Select Type...</option>
-                    <option value="patient">Patient</option>
-                    <option value="clinician">Clinician</option>
-                    <option value="herbalist">Herbalist</option>
-                    <option value="caregiver">Caregiver</option>
-                    <option value="policymaker">Policy Maker</option>
-                    <option value="researcher">Researcher</option>
-                  </select>
+                  <div class="d-flex flex-column gap-2">
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_patient" value="patient" required onchange="App.Screening.renderCriteria('patient')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Patient</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_clinician" value="clinician" required onchange="App.Screening.renderCriteria('clinician')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Clinician</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_herbalist" value="herbalist" required onchange="App.Screening.renderCriteria('herbalist')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Herbalist</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_caregiver" value="caregiver" required onchange="App.Screening.renderCriteria('caregiver')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Caregiver</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_policymaker" value="policymaker" required onchange="App.Screening.renderCriteria('policymaker')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Policy Maker</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrType" id="type_researcher" value="researcher" required onchange="App.Screening.renderCriteria('researcher')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Researcher</span>
+                    </label>
+                  </div>
                 </div>
-                <div class="col-md-6">
+
+                <!-- Study Site -->
+                <div class="col-12">
                   <label class="form-label">Study Site</label>
-                  <select class="form-control form-select" id="scrSite">
-                    <option value="">Select Site...</option>
-                    <option>Tetteh Quarshie Memorial Hospital</option>
-                    <option>Atibie Government Hospital</option>
-                    <option>Oda Government Hospital</option>
-                    <option>Suhum Government Hospital</option>
-                    <option>Atua Government Hospital</option>
-                    <option>Centre for Plant Medicine Research</option>
-                    <option>Eastern Regional Health Directorate</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <div class="d-flex flex-column gap-2">
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Tetteh Quarshie Memorial Hospital" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Tetteh Quarshie Memorial Hospital</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Atibie Government Hospital" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Atibie Government Hospital</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Oda Government Hospital" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Oda Government Hospital</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Suhum Government Hospital" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Suhum Government Hospital</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Atua Government Hospital" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Atua Government Hospital</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Centre for Plant Medicine Research" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Centre for Plant Medicine Research</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="Eastern Regional Health Directorate" onchange="App.$('scrSiteOther').classList.add('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Eastern Regional Health Directorate</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrSite" value="other" onchange="App.$('scrSiteOther').classList.remove('d-none')">
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Other (Specify)</span>
+                    </label>
+                  </div>
                   <input type="text" class="form-control mt-2 d-none" id="scrSiteOther" placeholder="Specify Site">
                 </div>
 
-                <div class="col-md-8">
+                <!-- Name -->
+                <div class="col-12">
                   <label class="form-label">Full Name / Initials</label>
                   <input type="text" class="form-control" id="scrName" placeholder="e.g. John Doe or J.D." required>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Auto ID -->
+                <div class="col-12">
                   <label class="form-label">ID (Auto)</label>
                   <input type="text" class="form-control" id="scrId" readonly>
                 </div>
 
-                <div class="col-md-6">
+                <!-- Age Range -->
+                <div class="col-12">
                   <label class="form-label">Age Range</label>
-                  <select class="form-control form-select" id="scrAge" required>
-                    <option value="18-24">18-24</option>
-                    <option value="25-34">25-34</option>
-                    <option value="35-44">35-44</option>
-                    <option value="45-54">45-54</option>
-                    <option value="55-64">55-64</option>
-                    <option value="65+">65+</option>
-                  </select>
+                  <div class="d-flex flex-column gap-2">
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="18-24" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">18-24</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="25-34" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">25-34</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="35-44" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">35-44</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="45-54" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">45-54</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="55-64" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">55-64</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrAge" value="65+" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">65+</span>
+                    </label>
+                  </div>
                 </div>
-                <div class="col-md-6">
+
+                <!-- Gender -->
+                <div class="col-12">
                   <label class="form-label">Gender</label>
-                  <select class="form-control form-select" id="scrGender" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
+                  <div class="d-flex flex-column gap-2">
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrGender" value="male" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Male</span>
+                    </label>
+                    <label class="d-flex align-items-center" style="cursor: pointer; padding: 14px; background: #ffffff; border-radius: 6px; border: 2px solid #cccccc;">
+                      <input type="radio" class="btn-check" name="scrGender" value="female" required>
+                      <span style="flex-grow: 1; font-size: 18px; color: #000000; font-weight: 500;">Female</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div class="col-12 mt-4">
@@ -938,62 +1256,80 @@
                 </div>
               </div>
 
-              <div class="d-flex justify-content-end gap-2 mt-4">
-                <button type="button" class="btn btn-outline" onclick="App.Screening.clearForm()">Clear/Cancel</button>
-                <button type="submit" class="btn btn-primary" id="saveBtn">Save Screening</button>
+              <div class="d-flex justify-content-between gap-2 mt-4">
+                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1.1rem; padding: 14px 24px;">
+                  <i class="bi bi-arrow-left me-2"></i>Back
+                </button>
+                <button type="submit" class="btn btn-primary" id="saveBtn" style="font-size: 1.1rem; padding: 14px 24px;">Save Screening</button>
               </div>
             </form>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: Participant Registry List -->
-        <div class="col-lg-4">
-          <div class="content-box h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Registry</h5>
-              <span class="badge" style="background: var(--bg-alt);" id="listCount">0</span>
-            </div>
-            <div class="mb-3">
-              <div class="input-group mb-2">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Search name or ID..."
-                  onkeyup="App.Participants.render()" id="partSearch">
-              </div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm flex-grow-1"
-                  onclick="App.Data.downloadCSV('participants')">
-                  <i class="bi bi-file-earmark-spreadsheet"></i> Export
-                </button>
-                <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="App.Data.downloadJSON()">
-                  <i class="bi bi-archive"></i> Backup
-                </button>
-                <button class="btn btn-outline-secondary btn-sm flex-grow-1"
-                  onclick="document.getElementById('importFile').click()">
-                  <i class="bi bi-upload"></i> Import
-                </button>
-                <input type="file" id="importFile" style="display:none" accept=".json"
-                  onchange="App.Data.importJSON(this)">
-              </div>
-            </div>
-
-            <div id="participantsList" class="participant-list-container pe-2">
-              <div class="text-center p-4 text-muted">
-                <i class="bi bi-people" style="font-size: 2rem; opacity: 0.5;"></i>
-                <p class="mt-2">No participants enrolled yet.</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. INTERVIEW SECTION -->
+    <!-- 3. RECORDS SECTION -->
+    <div id="records" class="content-section">
+      <div class="content-box">
+        <div class="d-flex justify-content-between align-items-center mb-4" style="flex-wrap: wrap; gap: 16px;">
+          <h4 class="mb-0" style="font-size: 1.5rem; font-weight: 700;"><i class="bi bi-list-ul me-2"></i>Participants Records</h4>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="badge" style="background: var(--primary); color: white; font-size: 1.1rem; padding: 8px 16px;" id="recordsCount">0</span>
+            <button class="btn btn-outline-primary" onclick="App.Records.toggleView()" style="font-size: 1rem; font-weight: 600; padding: 12px 18px; height: 50px;">
+              <i class="bi bi-grid-3x2-gap"></i> <span id="viewToggleText">List</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="recordsList" class="records-list list-view">
+          <div class="text-center p-4 text-muted">
+            <i class="bi bi-search" style="font-size: 3rem; opacity: 0.5;"></i>
+            <p class="mt-3" style="font-size: 1.2rem;">No participants found.</p>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-start gap-2 mt-4" style="flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1.1rem; font-weight: 600; padding: 14px 28px; height: 52px; border-width: 2px;">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. INTERVIEW SECTION -->
     <div id="interview" class="content-section">
       <div class="nav-pills mb-3" id="interviewTabs" style="justify-content: center;">
         <span class="nav-link active" data-tab="tab-idi" onclick="App.Interview.switchTab('idi')">IDI
           (Individual)</span>
         <span class="nav-link" data-tab="tab-fgd" onclick="App.Interview.switchTab('fgd')">FGD (Group)</span>
       </div>
+
+      <!-- Floating Audio Recorder -->
+      <div class="floating-recorder" id="floatingRecorder">
+        <div class="floating-recorder-header">
+          <h6><i class="bi bi-mic-fill me-2"></i>Audio Recorder</h6>
+          <button onclick="App.Interview.minimizeFloatingRecorder()" title="Minimize" style="cursor: pointer;">
+            <i class="bi bi-dash"></i>
+          </button>
+        </div>
+        <div class="floating-recorder-content">
+          <div class="floating-recorder-buttons">
+            <button class="btn btn-success rounded-pill" id="btnRecFloat" onclick="App.Audio.toggle('float')" style="padding: 12px 20px; font-size: 1rem; font-weight: 600;">
+              <i class="bi bi-record-circle"></i> Record
+            </button>
+            <button class="btn btn-danger rounded-pill" id="btnPauseFloat" onclick="App.Audio.pause('float')" disabled style="padding: 12px 20px; font-size: 1rem; font-weight: 600;">
+              <i class="bi bi-pause"></i> Pause
+            </button>
+          </div>
+          <div class="floating-recorder-status" id="statusFloat">Ready</div>
+          <audio id="playerFloat" class="floating-recorder-player" style="display:none;"></audio>
+        </div>
+      </div>
+
+      <!-- Minimize Button - Always Accessible -->
+      <button class="floating-recorder-minimize-btn" id="minimizeBtn" onclick="App.Interview.restoreFloatingRecorder()" title="Show Recorder">
+        <i class="bi bi-mic-fill"></i>
+      </button>
 
       <div class="tab-content">
         <!-- IDI Tab -->
@@ -1013,21 +1349,9 @@
                   onchange="App.Interview.handleParticipantChange(this.value, 'idi')"></select>
               </div>
 
-              <!-- Audio Controls -->
-              <div class="content-box mb-3" style="background: var(--bg-alt);">
-                <div class="text-center">
-                  <div class="d-flex justify-content-center gap-2 mb-2">
-                    <button class="btn btn-success rounded-pill" id="btnRecIdi" onclick="App.Audio.toggle('idi')">
-                      <i class="bi bi-record-circle"></i> Record
-                    </button>
-                    <button class="btn btn-danger rounded-pill" id="btnPauseIdi" onclick="App.Audio.pause('idi')"
-                      disabled>
-                      <i class="bi bi-pause"></i> Pause
-                    </button>
-                  </div>
-                  <div id="statusIdi" class="small text-muted mb-2">Ready</div>
-                  <audio id="playerIdi" controls class="w-100" style="display:none; height: 30px;"></audio>
-                </div>
+              <!-- Audio Controls - Now floating at top -->
+              <div class="alert alert-info small mb-3">
+                <i class="bi bi-info-circle me-2"></i>Use the floating audio recorder at the top-right to record your interview
               </div>
 
               <div class="mb-3">
@@ -1035,9 +1359,14 @@
                 <textarea class="form-control" id="idiNotes" rows="6"
                   placeholder="Interview transcript/notes..."></textarea>
               </div>
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline" onclick="App.Interview.save('idi')">Save Draft</button>
-                <button class="btn btn-primary" onclick="App.Interview.complete('idi')">Complete Interview</button>
+              <div class="d-flex justify-content-between gap-2">
+                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1rem; padding: 12px 20px;">
+                  <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </button>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline" onclick="App.Interview.save('idi')">Save Draft</button>
+                  <button class="btn btn-primary" onclick="App.Interview.complete('idi')">Complete</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1071,29 +1400,22 @@
                 </div>
               </div>
 
-              <!-- Audio Controls FGD -->
-              <div class="content-box mb-3" style="background: var(--bg-alt);">
-                <div class="text-center">
-                  <div class="d-flex justify-content-center gap-2 mb-2">
-                    <button class="btn btn-success rounded-pill" id="btnRecFgd" onclick="App.Audio.toggle('fgd')">
-                      <i class="bi bi-record-circle"></i> Record
-                    </button>
-                    <button class="btn btn-danger rounded-pill" id="btnPauseFgd" onclick="App.Audio.pause('fgd')"
-                      disabled>
-                      <i class="bi bi-pause"></i> Pause
-                    </button>
-                  </div>
-                  <div id="statusFgd" class="small text-muted mb-2">Ready</div>
-                  <audio id="playerFgd" controls class="w-100" style="display:none; height: 30px;"></audio>
-                </div>
+              <!-- Audio Controls - Now floating at top -->
+              <div class="alert alert-info small mb-3">
+                <i class="bi bi-info-circle me-2"></i>Use the floating audio recorder at the top-right to record your FGD
               </div>
 
               <div class="mb-3">
                 <textarea class="form-control" id="fgdNotes" rows="5" placeholder="FGD Notes..."></textarea>
               </div>
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline" onclick="App.Interview.save('fgd')">Save Draft</button>
-                <button class="btn btn-primary" onclick="App.Interview.complete('fgd')">Complete FGD</button>
+              <div class="d-flex justify-content-between gap-2">
+                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1rem; padding: 12px 20px;">
+                  <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </button>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline" onclick="App.Interview.save('fgd')">Save Draft</button>
+                  <button class="btn btn-primary" onclick="App.Interview.complete('fgd')">Complete</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1102,7 +1424,7 @@
     </div>
     </div>
 
-    <!-- 4. DATA SECTION -->
+    <!-- 5. DATA SECTION -->
     <div id="data" class="content-section">
       <div class="content-box">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1169,6 +1491,11 @@
       <span id="toastMsg">Action Successful</span>
     </div>
   </div>
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="scroll-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
 
   <!-- APP LOGIC -->
   <script>
@@ -1422,12 +1749,26 @@
               sections.forEach(s => s.classList.remove('active'));
               App.$(targetId).classList.add('active');
 
-              if (targetId === 'screening') App.Participants.render();
-              if (targetId === 'data') App.Data.renderAudioList();
+              if (targetId === 'screening') {
+                App.Participants.render();
+                App.Interview.toggleFloatingRecorder(false);
+              }
+              if (targetId === 'records') {
+                App.Records.render();
+                App.Interview.toggleFloatingRecorder(false);
+              }
+              if (targetId === 'data') {
+                App.Data.renderAudioList();
+                App.Interview.toggleFloatingRecorder(false);
+              }
               if (targetId === 'interview') {
                 App.Interview.loadParticipants('idi');
                 App.Interview.loadParticipants('fgd');
                 App.Interview.updateFgdGuide();
+                App.Interview.toggleFloatingRecorder(true);
+              }
+              if (targetId === 'dashboard') {
+                App.Interview.toggleFloatingRecorder(false);
               }
             });
           });
@@ -1443,6 +1784,9 @@
       Dashboard: {
         update: () => {
           const s = App.State;
+          const $ = (id) => App.$(id);
+          const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+          const setHTML = (id, val) => { const el = $(id); if (el) el.innerHTML = val; };
 
           // Primary metrics
           const totalEnrolled = s.participants.length;
@@ -1457,17 +1801,17 @@
           const totalRecordings = s.audioRecordings.length;
           const interviewRate = eligibleForIDI > 0 ? Math.round((totalInterviews / eligibleForIDI) * 100) : 0;
 
-          // Update primary metrics
-          App.$('dashTotal').textContent = totalEnrolled;
-          App.$('dashEligible').textContent = eligible;
-          App.$('dashIneligible').textContent = ineligible;
-          App.$('dashEligibilityRate').textContent = `${eligibilityRate}%`;
+          // Update primary metrics (null-safe)
+          set('dashTotal', totalEnrolled);
+          set('dashEligible', eligible);
+          set('dashIneligible', ineligible);
+          set('dashEligibilityRate', `${eligibilityRate}%`);
 
-          // Update interview metrics
-          App.$('dashInterviews').textContent = totalInterviews;
-          App.$('dashPendingIDI').textContent = Math.max(0, pendingIDI);
-          App.$('dashAudio').textContent = totalRecordings;
-          App.$('dashInterviewRate').textContent = `${interviewRate}%`;
+          // Update interview metrics (null-safe)
+          set('dashInterviews', totalInterviews);
+          set('dashPendingIDI', Math.max(0, pendingIDI));
+          set('dashAudio', totalRecordings);
+          set('dashInterviewRate', `${interviewRate}%`);
 
           // Participant distribution by type
           const types = ['patient', 'clinician', 'herbalist', 'caregiver', 'policymaker', 'researcher'];
@@ -1493,18 +1837,12 @@
               </div>
             `;
           }).join('');
-          App.$('dashDistribution').innerHTML = html;
+          setHTML('dashDistribution', html);
         }
       },
 
       Screening: {
         initListeners: () => {
-          App.$('scrType').addEventListener('change', (e) => App.Screening.renderCriteria(e.target.value));
-          App.$('scrSite').addEventListener('change', (e) => {
-            const other = App.$('scrSiteOther');
-            if (e.target.value === 'other') other.classList.remove('d-none');
-            else other.classList.add('d-none');
-          });
           App.$('screeningForm').addEventListener('submit', App.Screening.save);
         },
 
@@ -1520,17 +1858,23 @@
 
           const list = criteriaMap[type] || [];
           const html = list.map((c, i) => `
-            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-              <span class="small flex-grow-1 pe-2">${c}</span>
-              <div class="btn-group btn-group-sm flex-shrink-0">
-                <input type="radio" class="btn-check" name="crit_${i}" id="y_${i}" value="yes" required ${existingCriteria && existingCriteria[i] === 'yes' ? 'checked' : ''}>
-                <label class="btn btn-outline" style="border-color: var(--success); color: var(--success);" for="y_${i}">Yes</label>
-                <input type="radio" class="btn-check" name="crit_${i}" id="n_${i}" value="no" ${existingCriteria && existingCriteria[i] === 'no' ? 'checked' : ''}>
-                <label class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" for="n_${i}">No</label>
+            <div class="mb-3 pb-3 border-bottom">
+              <span class="small fw-600 d-block mb-2">${c}</span>
+              <div class="d-flex flex-column gap-2">
+                <label class="d-flex align-items-center" style="cursor: pointer; padding: 10px; background: var(--bg-alt); border-radius: 6px; border: 1px solid var(--border);">
+                  <input type="radio" class="btn-check" name="crit_${i}" id="y_${i}" value="yes" required ${existingCriteria && existingCriteria[i] === 'yes' ? 'checked' : ''} style="margin-right: 10px;">
+                  <i class="bi bi-check-circle" style="color: var(--success); margin-right: 8px; font-size: 1.2rem;"></i>
+                  <span>Yes</span>
+                </label>
+                <label class="d-flex align-items-center" style="cursor: pointer; padding: 10px; background: var(--bg-alt); border-radius: 6px; border: 1px solid var(--border);">
+                  <input type="radio" class="btn-check" name="crit_${i}" id="n_${i}" value="no" ${existingCriteria && existingCriteria[i] === 'no' ? 'checked' : ''} style="margin-right: 10px;">
+                  <i class="bi bi-x-circle" style="color: var(--danger); margin-right: 8px; font-size: 1.2rem;"></i>
+                  <span>No</span>
+                </label>
               </div>
             </div>
           `).join('');
-          App.$('eligibilityList').innerHTML = html || '<p class="text-muted small">Select a valid type.</p>';
+          App.$('eligibilityList').innerHTML = html || '<p class="text-muted small text-center">Select a participant type to see criteria.</p>';
 
           if (!App.$('editOriginalId').value) {
             App.Screening.generateId(type);
@@ -1550,19 +1894,27 @@
         },
 
         loadForEdit: (participant) => {
-          App.$('scrType').value = participant.type;
+          // Set participant type radio button
+          document.getElementById('type_' + participant.type).checked = true;
+          
           App.$('scrName').value = participant.name;
-          App.$('scrAge').value = participant.age;
-          App.$('scrGender').value = participant.gender;
+          
+          // Set age range radio button
+          document.querySelector(`input[name="scrAge"][value="${participant.age}"]`).checked = true;
+          
+          // Set gender radio button
+          document.querySelector(`input[name="scrGender"][value="${participant.gender}"]`).checked = true;
+          
           App.$('scrId').value = participant.id;
           App.$('editOriginalId').value = participant.id;
 
+          // Set site radio button
           const defaultSites = ['Tetteh Quarshie Memorial Hospital', 'Atibie Government Hospital', 'Oda Government Hospital', 'Suhum Government Hospital', 'Atua Government Hospital', 'Centre for Plant Medicine Research', 'Eastern Regional Health Directorate'];
           if (defaultSites.includes(participant.site)) {
-            App.$('scrSite').value = participant.site;
+            document.querySelector(`input[name="scrSite"][value="${participant.site}"]`).checked = true;
             App.$('scrSiteOther').classList.add('d-none');
           } else {
-            App.$('scrSite').value = 'other';
+            document.querySelector('input[name="scrSite"][value="other"]').checked = true;
             App.$('scrSiteOther').classList.remove('d-none');
             App.$('scrSiteOther').value = participant.site;
           }
@@ -1576,14 +1928,13 @@
         save: (e) => {
           e.preventDefault();
 
-          // Custom Validation for Site
-          const siteSelect = App.$('scrSite');
+          // Get selected site value from radio buttons
+          const siteRadio = document.querySelector('input[name="scrSite"]:checked');
+          let siteValue = siteRadio ? siteRadio.value : '';
           const siteOther = App.$('scrSiteOther');
-          let siteValue = siteSelect.value;
 
           if (!siteValue) {
             alert("Please select a Study Site");
-            siteSelect.focus();
             return;
           }
 
@@ -1601,13 +1952,18 @@
           const isEligible = criteriaValues.every(v => v === 'yes') && criteriaValues.length > 0;
           const editId = App.$('editOriginalId').value;
 
+          // Get values from radio buttons
+          const typeRadio = document.querySelector('input[name="scrType"]:checked');
+          const ageRadio = document.querySelector('input[name="scrAge"]:checked');
+          const genderRadio = document.querySelector('input[name="scrGender"]:checked');
+
           const participant = {
             id: editId || App.$('scrId').value,
-            type: App.$('scrType').value,
+            type: typeRadio ? typeRadio.value : '',
             name: App.$('scrName').value,
-            site: App.$('scrSite').value === 'other' ? App.$('scrSiteOther').value.trim() : App.$('scrSite').value,
-            age: App.$('scrAge').value,
-            gender: App.$('scrGender').value,
+            site: siteValue,
+            age: ageRadio ? ageRadio.value : '',
+            gender: genderRadio ? genderRadio.value : '',
             isEligible: isEligible,
             criteria: criteriaValues,
             date: new Date().toISOString(),
@@ -1627,13 +1983,17 @@
           }
 
           // Save to Unified DB
-          db.upsert('participants', participant).then(() => {
-            console.log('✅ Participant saved to IDB');
-          }).catch(err => console.error('❌ Failed to save participant to IDB', err));
+          if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
+            UhasIDB.put('participants', participant).then(() => {
+              console.log('✅ Participant saved to IDB');
+            }).catch(err => console.error('❌ Failed to save participant to IDB', err));
+          }
 
           App.Storage.save();
           App.Screening.clearForm();
           App.Participants.render();
+          App.switchSection('records');
+          App.Records.render();
         },
 
         clearForm: () => {
@@ -1648,6 +2008,20 @@
       },
 
       Interview: {
+        minimizeFloatingRecorder: () => {
+          const recorder = App.$('floatingRecorder');
+          const minimizeBtn = App.$('minimizeBtn');
+          recorder.classList.add('minimized');
+          minimizeBtn.classList.add('visible');
+        },
+
+        restoreFloatingRecorder: () => {
+          const recorder = App.$('floatingRecorder');
+          const minimizeBtn = App.$('minimizeBtn');
+          recorder.classList.remove('minimized');
+          minimizeBtn.classList.remove('visible');
+        },
+
         switchTab: (mode) => {
           document.querySelectorAll('.nav-pills .nav-link').forEach(t => t.classList.remove('active'));
           document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -1660,6 +2034,17 @@
             document.querySelector('[data-tab="tab-fgd"]').classList.add('active');
             App.$('tab-fgd').classList.add('active');
             App.Interview.loadParticipants('fgd');
+          }
+          // Show floating recorder when switching to interview tabs
+          App.Interview.toggleFloatingRecorder(true);
+        },
+
+        toggleFloatingRecorder: (show) => {
+          const recorder = App.$('floatingRecorder');
+          if (show) {
+            recorder.classList.add('active');
+          } else {
+            recorder.classList.remove('active');
           }
         },
 
@@ -2479,8 +2864,13 @@
 
           if (!notes && !pid) return alert("Select participant and add notes.");
 
+          // Build consistent naming: participantID_sitename_date
+          const participant = App.State.participants.find(p => p.id === pid);
+          const siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+          const dateStr = new Date().toISOString().split('T')[0];
+
           const record = {
-            id: `INT-${Date.now()}`,
+            id: `${pid}_${siteName}_${dateStr}_INT`,
             mode: mode,
             participantId: pid,
             notes: notes,
@@ -2489,36 +2879,81 @@
             type: 'toolkit-a-interview'
           };
 
-          App.State.interviews.push(record);
+          // Check if an interview for this participant already exists (update instead of duplicate)
+          const existingIdx = App.State.interviews.findIndex(i => i.participantId === pid && i.mode === mode);
+          if (existingIdx !== -1) {
+            App.State.interviews[existingIdx] = record;
+          } else {
+            App.State.interviews.push(record);
+          }
 
           // Save to Unified DB
-          db.upsert('toolkit', record).then(() => {
-            console.log('✅ Interview saved to IDB');
-          }).catch(err => console.error('❌ Failed to save interview to IDB', err));
+          if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
+            UhasIDB.put('interviews', record).then(() => {
+              console.log('✅ Interview saved to IDB');
+            }).catch(err => console.error('❌ Failed to save interview to IDB', err));
+          }
 
           App.Storage.save();
           App.Toast("Interview Saved!");
         },
 
         complete: (mode) => {
+          // Stop recording if active
+          const btn = App.$('btnRecFloat');
+          if (btn && btn.classList.contains('recording') && App.Audio.mediaRecorder) {
+            App.Audio.mediaRecorder.stop();
+            btn.classList.remove('recording', 'btn-danger');
+            btn.classList.add('btn-success');
+            btn.innerHTML = '<i class="bi bi-record-circle"></i> Record';
+            App.$('statusFloat').textContent = 'Processing...';
+            App.$('btnPauseFloat').disabled = true;
+          }
+
+          // Save interview notes
           App.Interview.save(mode);
+
+          // Clear form
           if (mode === 'idi') {
             App.$('idiNotes').value = '';
             App.$('idiParticipantSelect').value = '';
           } else {
             App.$('fgdNotes').value = '';
           }
+
+          // Hide floating recorder and navigate to Records
+          App.Interview.toggleFloatingRecorder(false);
+          App.Interview.minimizeFloatingRecorder();
+
+          // Small delay to let audio save complete, then navigate
+          setTimeout(() => {
+            App.switchSection('records');
+            App.Records.render();
+            App.Toast('Interview completed! View recordings below.');
+          }, 500);
         }
       },
 
       Audio: {
         mediaRecorder: null,
         chunks: [],
+        currentMode: 'float', // Track which tab is recording
 
         toggle: async (mode) => {
-          const btn = App.$(mode === 'idi' ? 'btnRecIdi' : 'btnRecFgd');
-          const status = App.$(mode === 'idi' ? 'statusIdi' : 'statusFgd');
-          const pauseBtn = App.$(mode === 'idi' ? 'btnPauseIdi' : 'btnPauseFgd');
+          // Map float mode to the actual current tab
+          if (mode === 'float') {
+            // Determine which tab is currently active
+            const idiTab = App.$('tab-idi');
+            const fgdTab = App.$('tab-fgd');
+            mode = idiTab.classList.contains('active') ? 'idi' : 'fgd';
+            App.Audio.currentMode = mode;
+          } else {
+            App.Audio.currentMode = mode;
+          }
+
+          const btn = App.$('btnRecFloat');
+          const status = App.$('statusFloat');
+          const pauseBtn = App.$('btnPauseFloat');
 
           if (btn.classList.contains('recording')) {
             App.Audio.mediaRecorder.stop();
@@ -2530,11 +2965,24 @@
           } else {
             try {
               const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-              App.Audio.mediaRecorder = new MediaRecorder(stream);
+
+              // Choose best audio format: prefer mp4/aac (Safari) > webm/opus > default
+              let mimeType = '';
+              if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                mimeType = 'audio/mp4';
+              } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                mimeType = 'audio/webm;codecs=opus';
+              } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                mimeType = 'audio/webm';
+              }
+              App.Audio.mimeType = mimeType || 'audio/webm';
+
+              const recorderOptions = mimeType ? { mimeType } : {};
+              App.Audio.mediaRecorder = new MediaRecorder(stream, recorderOptions);
               App.Audio.chunks = [];
 
               App.Audio.mediaRecorder.ondataavailable = e => App.Audio.chunks.push(e.data);
-              App.Audio.mediaRecorder.onstop = () => App.Audio.saveRecording(mode);
+              App.Audio.mediaRecorder.onstop = () => App.Audio.saveRecording(App.Audio.currentMode);
 
               App.Audio.mediaRecorder.start();
 
@@ -2552,14 +3000,14 @@
 
         pause: (mode) => {
           const rec = App.Audio.mediaRecorder;
-          const btn = App.$(mode === 'idi' ? 'btnPauseIdi' : 'btnPauseFgd');
-          const status = App.$(mode === 'idi' ? 'statusIdi' : 'statusFgd');
+          const btn = App.$('btnPauseFloat');
+          const status = App.$('statusFloat');
 
-          if (rec.state === "recording") {
+          if (rec && rec.state === "recording") {
             rec.pause();
             btn.innerHTML = '<i class="bi bi-play"></i>';
             status.textContent = "Paused";
-          } else if (rec.state === "paused") {
+          } else if (rec && rec.state === "paused") {
             rec.resume();
             btn.innerHTML = '<i class="bi bi-pause"></i>';
             status.innerHTML = '<span class="text-danger blink">● Recording...</span>';
@@ -2567,28 +3015,37 @@
         },
 
         saveRecording: async (mode) => {
-          const blob = new Blob(App.Audio.chunks, { type: 'audio/webm' });
+          const actualMime = App.Audio.mimeType || 'audio/webm';
+          const blob = new Blob(App.Audio.chunks, { type: actualMime });
 
-          const player = App.$(mode === 'idi' ? 'playerIdi' : 'playerFgd');
-          const statusEl = App.$(mode === 'idi' ? 'statusIdi' : 'statusFgd');
+          const player = App.$('playerFloat');
+          const statusEl = App.$('statusFloat');
           statusEl.textContent = "Saving...";
 
-          const participantId = mode === 'idi' ? App.$('idiParticipantSelect').value : 'FGD';
+          // Map 'float' mode to actual active tab
+          let actualMode = mode;
+          if (mode === 'float') {
+            const idiTab = App.$('tab-idi');
+            actualMode = idiTab && idiTab.classList.contains('active') ? 'idi' : 'fgd';
+          }
+          
+          const participantId = actualMode === 'idi' ? App.$('idiParticipantSelect').value : 'FGD';
 
           // Get participant details for naming
           let site = 'UNKNOWN';
           let participantName = participantId;
-          if (mode === 'idi' && participantId) {
+          if (actualMode === 'idi' && participantId) {
             const participant = App.State.participants.find(p => p.id === participantId);
             if (participant) {
-              site = participant.site ? participant.site.replace(/\s+/g, '_').substring(0, 20) : 'UNKNOWN';
+              site = participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
               participantName = participant.id;
             }
+          } else if (actualMode === 'fgd') {
+            participantName = 'FGD_GROUP';
           }
 
           const dateStr = new Date().toISOString().split('T')[0];
-          const timeStr = new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-');
-          const id = `${participantName}_${site}_${dateStr}_${timeStr}`;
+          const id = `${participantName}_${site}_${dateStr}_AUDIO`;
 
           // Setup audio player with proper event handlers
           player.style.display = 'block';
@@ -2598,7 +3055,7 @@
           // Prepare the blob URL for playback
           const url = URL.createObjectURL(blob);
           player.src = url;
-          player.type = 'audio/webm';
+          player.type = actualMime;
 
           // Set up event handlers for playback feedback
           player.oncanplay = () => {
@@ -2622,7 +3079,7 @@
           // Store blob in IndexedDB for persistence
           try {
             await App.AudioDB.saveBlob(id, blob, {
-              mode,
+              mode: actualMode,
               participantId,
               date: new Date().toISOString()
             });
@@ -2635,7 +3092,8 @@
           App.State.audioBlobs[id] = blob;
           const recordingData = {
             id: id,
-            mode: mode,
+            mode: actualMode,
+            mimeType: actualMime,
             date: new Date().toISOString(),
             participantId: participantId
           };
@@ -2644,19 +3102,18 @@
 
           // Save to unified database for synchronization
           try {
-            if (typeof db !== 'undefined') {
-              await UhasIDB.put('interviews', {
+            if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
+              await UhasIDB.put('audioRecordings', {
+                id: id,
                 module: 'toolkit-a',
                 type: 'audio-recording',
                 participantId: participantId,
-                data: {
-                  recordingId: id,
-                  mode: mode,
-                  date: new Date().toISOString(),
-                  participantId: participantId,
-                  status: 'completed',
-                  hasAudioBlob: true
-                }
+                recordingId: id,
+                mode: actualMode,
+                mimeType: actualMime,
+                date: new Date().toISOString(),
+                status: 'completed',
+                hasAudioBlob: true
               });
               console.log('✅ Audio metadata saved to unified database');
             }
@@ -2664,7 +3121,7 @@
             console.error('Failed to save to unified database:', err);
           }
 
-          App.$(mode === 'idi' ? 'statusIdi' : 'statusFgd').textContent = "Saved!";
+          App.$('statusFloat').textContent = "Saved!";
           App.Toast("Audio Recorded & Saved locally!");
 
           // Attempt background upload
@@ -2677,14 +3134,16 @@
       Participants: {
         render: () => {
           const list = App.$('participantsList');
-          const term = App.$('partSearch').value.toLowerCase();
+          if (!list) return;
+          const searchEl = App.$('partSearch');
+          const term = searchEl ? searchEl.value.toLowerCase() : '';
           const countBadge = App.$('listCount');
 
           const filtered = App.State.participants.filter(p =>
             p.name.toLowerCase().includes(term) || p.id.toLowerCase().includes(term)
           );
 
-          countBadge.textContent = filtered.length;
+          if (countBadge) countBadge.textContent = filtered.length;
 
           if (filtered.length === 0) {
             list.innerHTML = '<div class="text-center p-4 text-muted"><i class="bi bi-search" style="font-size: 2rem; opacity: 0.5;"></i><p class="mt-2">No participants found.</p></div>';
@@ -2740,6 +3199,247 @@
           }
         }
       },
+
+      // Records Section
+      Records: {
+        currentView: 'list', // 'list' or 'card'
+
+        toggleView: () => {
+          const list = App.$('recordsList');
+          const toggle = App.$('viewToggleText');
+          
+          if (App.Records.currentView === 'list') {
+            App.Records.currentView = 'card';
+            list.classList.remove('list-view');
+            list.classList.add('card-view');
+            toggle.textContent = 'List';
+          } else {
+            App.Records.currentView = 'list';
+            list.classList.remove('card-view');
+            list.classList.add('list-view');
+            toggle.textContent = 'Grid';
+          }
+        },
+
+        render: () => {
+          const list = App.$('recordsList');
+          const countBadge = App.$('recordsCount');
+
+          const filtered = App.State.participants;
+
+          countBadge.textContent = filtered.length;
+
+          if (filtered.length === 0) {
+            list.innerHTML = '<div class="text-center p-4 text-muted" style="grid-column: 1/-1;"><i class="bi bi-search" style="font-size: 3rem; opacity: 0.5;"></i><p class="mt-3" style="font-size: 1.2rem;">No participants found.</p></div>';
+            return;
+          }
+
+          const participantsWithAudio = filtered.filter(p => App.State.audioRecordings.some(a => a.participantId === p.id));
+
+          list.innerHTML = filtered.map(p => {
+            const hasAudio = App.State.audioRecordings.some(a => a.participantId === p.id);
+            const pid = p.id.replace(/'/g, "\\'");
+            return `
+              <div class="record-item">
+                <div class="record-info">
+                  <h6>${p.name} <small>${p.id}</small></h6>
+                  <small>${p.type} | ${p.gender}, ${p.age} | ${p.site || 'No site'}</small>
+                </div>
+                ${hasAudio ? `<div class="w-100 mt-2 mb-2"><audio id="audio_${pid}" controls preload="none" style="width:100%; height:44px;"></audio></div>` : ''}
+                <div class="record-actions">
+                  <button class="btn btn-success" title="Start Interview" onclick="App.Records.startInterview('${pid}')">
+                    <i class="bi bi-mic-fill me-2"></i>Interview
+                  </button>
+                  ${hasAudio ? `<button class="btn btn-primary" title="Share Audio via WhatsApp" onclick="App.Records.shareAudioWhatsApp('${pid}')">
+                    <i class="bi bi-whatsapp me-2"></i>Audio
+                  </button>` : ''}
+                  <button class="btn btn-info" title="Share Data via WhatsApp" onclick="App.Records.shareWhatsApp('${pid}')">
+                    <i class="bi bi-whatsapp me-2"></i>Data
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Auto-load audio for all participants that have recordings
+          participantsWithAudio.forEach(p => {
+            const pid = p.id.replace(/'/g, "\\'");
+            App.Records.loadAudio(pid);
+          });
+        },
+
+        loadAudio: async (participantId) => {
+          const audioEl = document.getElementById(`audio_${participantId}`);
+          if (!audioEl) return;
+
+          const recordings = App.State.audioRecordings.filter(a => a.participantId === participantId);
+          if (recordings.length === 0) {
+            App.Toast('No audio recordings found.');
+            return;
+          }
+
+          const latest = recordings[recordings.length - 1];
+          let blob = App.State.audioBlobs[latest.id];
+
+          if (!blob) {
+            try {
+              const record = await App.AudioDB.getBlob(latest.id);
+              if (record) blob = record.blob;
+            } catch (err) {
+              console.error('Failed to load audio:', err);
+            }
+          }
+
+          if (!blob) {
+            App.Toast('Audio file not available on this device.');
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          audioEl.src = url;
+          audioEl.load();
+        },
+
+        shareAudioWhatsApp: async (participantId) => {
+          const participant = App.State.participants.find(p => p.id === participantId);
+          const recordings = App.State.audioRecordings.filter(a => a.participantId === participantId);
+
+          if (recordings.length === 0) {
+            App.Toast('No audio recordings found.');
+            return;
+          }
+
+          const latest = recordings[recordings.length - 1];
+          let blob = App.State.audioBlobs[latest.id];
+
+          if (!blob) {
+            try {
+              const record = await App.AudioDB.getBlob(latest.id);
+              if (record) blob = record.blob;
+            } catch (err) {
+              console.error('Failed to load audio:', err);
+            }
+          }
+
+          if (!blob) {
+            App.Toast('Audio file not available on this device.');
+            return;
+          }
+
+          const siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+          const dateStr = new Date().toISOString().split('T')[0];
+          const mime = latest.mimeType || blob.type || 'audio/webm';
+          const ext = mime.includes('mp4') ? 'm4a' : 'webm';
+          const filename = `${participantId}_${siteName}_${dateStr}.${ext}`;
+
+          if (navigator.share && navigator.canShare) {
+            const file = new File([blob], filename, { type: mime });
+            const shareData = { files: [file], title: `Audio - ${participant ? participant.name : participantId}` };
+            if (navigator.canShare(shareData)) {
+              try {
+                await navigator.share(shareData);
+                App.Toast('Audio shared!');
+                return;
+              } catch (err) {
+                console.log('Share cancelled or failed:', err);
+              }
+            }
+          }
+
+          // Fallback: download file
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+          App.Toast(`Downloaded: ${filename}. Send via WhatsApp manually.`);
+        },
+
+        startInterview: (participantId) => {
+          App.switchSection('interview');
+          const idiSelect = App.$('idiParticipantSelect');
+          if (idiSelect) {
+            idiSelect.value = participantId;
+            App.Interview.switchTab('idi');
+          }
+        },
+
+        shareRecord: (participantId) => {
+          const participant = App.State.participants.find(p => p.id === participantId);
+          const interviews = App.State.interviews.filter(i => i.participantId === participantId);
+          
+          if (interviews.length === 0) {
+            alert('No interviews found for this participant');
+            return;
+          }
+
+          const shareData = {
+            participant: participant,
+            interviews: interviews,
+            exported_at: new Date().toISOString()
+          };
+
+          const siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+          const dateStr = new Date().toISOString().split('T')[0];
+          App.Records.share(shareData, `${participantId}_${siteName}_${dateStr}`);
+        },
+
+        shareWhatsApp: (participantId) => {
+          const participant = App.State.participants.find(p => p.id === participantId);
+          const interviews = App.State.interviews.filter(i => i.participantId === participantId);
+          const audioRecordings = App.State.audioRecordings.filter(a => a.participantId === participantId);
+
+          const shareData = {
+            participant: participant,
+            interviews: interviews,
+            audioRecordings: audioRecordings.map(a => ({ ...a, blob: null, url: null })),
+            exported_at: new Date().toISOString()
+          };
+
+          const json = JSON.stringify(shareData, null, 2);
+          const blob = new Blob([json], { type: 'application/json' });
+
+          const siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+          const dateStr = new Date().toISOString().split('T')[0];
+          const filename = `${participantId}_${siteName}_${dateStr}_DATA.json`;
+          const text = `📋 Study Records - ${participant ? participant.name : participantId}`;
+          
+          if (navigator.share) {
+            const file = new File([blob], filename, { type: 'application/json' });
+            navigator.share({
+              title: 'Study Records',
+              text: text,
+              files: [file]
+            }).catch(err => {
+              // Fallback: download
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = filename;
+              link.click();
+              App.Toast(`Downloaded: ${filename}`);
+            });
+          } else {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            App.Toast(`Downloaded: ${filename}. Send via WhatsApp.`);
+          }
+        },
+
+        share: (data, filename) => {
+          const json = JSON.stringify(data, null, 2);
+          const blob = new Blob([json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${filename}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      },
+
       Data: {
         downloadCSV: (type) => {
           let csv = "";
@@ -2758,16 +3458,18 @@
           const blob = new Blob([csv], { type: 'text/csv' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
+          const dateStr = new Date().toISOString().split('T')[0];
           a.href = url;
-          a.download = `toolkit_${type}_${Date.now()}.csv`;
+          a.download = `UHAS_toolkit_a_${type}_${dateStr}.csv`;
           a.click();
         },
 
         downloadJSON: () => {
+          const dateStr = new Date().toISOString().split('T')[0];
           const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(App.State));
           const a = document.createElement('a');
           a.href = dataStr;
-          a.download = `toolkit_backup_${Date.now()}.json`;
+          a.download = `UHAS_toolkit_a_backup_${dateStr}.json`;
           a.click();
         },
 
@@ -2871,9 +3573,8 @@
             const dbRecord = storedBlobs.find(b => b.id === r.id);
             const isSynced = dbRecord?.synced;
 
-            // Extract clean display name: remove time component from id
-            const parts = r.id.split('_');
-            const cleanName = parts.slice(0, -1).join('_');
+            // Use full ID as display name (already participantID_site_date_AUDIO format)
+            const cleanName = r.id;
 
             return `
             <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: var(--bg-alt); border-radius: var(--radius-sm);">
@@ -2914,12 +3615,8 @@
 
           if (!blob) return alert("Audio file not available.");
 
-          // Extract download name: remove time component from id
-          // ID format: ParticipantID_Site_Date_Time
-          // Download format: ParticipantID_Site_Date
-          const parts = id.split('_');
-          // Remove last part (time) to get clean filename
-          const downloadName = parts.slice(0, -1).join('_');
+          // Download format: participantID_site_date
+          const downloadName = id;
 
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -3009,8 +3706,40 @@
             App.Toast('All data cleared!');
           }
         }
+      },
+
+      // Switch between sections (Dashboard, Screening, Records, Interview, Data)
+      switchSection: (targetId) => {
+        App.Navigation.goTo(targetId);
       }
     };
+
+    // Initialize scroll-to-top button
+    window.addEventListener('scroll', () => {
+      const scrollBtn = document.getElementById('scrollToTop');
+      if (scrollBtn) {
+        if (window.pageYOffset > 300) {
+          scrollBtn.classList.add('show');
+        } else {
+          scrollBtn.classList.remove('show');
+        }
+      }
+    });
+
+    // Make dropdowns more accessible for touch/older users
+    document.addEventListener('DOMContentLoaded', () => {
+      const selects = document.querySelectorAll('select.form-select, select.form-control');
+      selects.forEach(select => {
+        select.style.minHeight = '48px';
+        select.style.fontSize = '16px';
+        select.style.padding = '10px';
+        if (select.querySelectorAll('option').length > 0) {
+          select.querySelectorAll('option').forEach(option => {
+            option.style.padding = '8px';
+          });
+        }
+      });
+    });
 
     // Initialize the application
     window.addEventListener('DOMContentLoaded', () => {
