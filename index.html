@@ -1525,6 +1525,14 @@
           </div>
           <div class="floating-recorder-status" id="statusFloat">Ready</div>
           <audio id="playerFloat" class="floating-recorder-player" style="display:none;"></audio>
+          <div id="floatingRecorderActions" style="display:none; margin-top: 10px; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-outline btn-sm rounded-pill" id="btnDownloadFloat" onclick="App.Audio.downloadLastRecording()" style="flex:1; min-width: 120px;">
+              <i class="bi bi-download me-1"></i>Download
+            </button>
+            <button class="btn btn-success btn-sm rounded-pill" id="btnShareFloat" onclick="App.Audio.shareLastRecording()" style="flex:1; min-width: 120px;">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3140,6 +3148,50 @@
         mediaRecorder: null,
         chunks: [],
         currentMode: 'float', // Track which tab is recording
+        lastRecordingId: null,
+        lastRecordingMime: null,
+
+        downloadLastRecording: async () => {
+          const id = App.Audio.lastRecordingId;
+          if (!id) { App.Toast('No recording to download.'); return; }
+          await App.Data.downloadAudio(id);
+        },
+
+        shareLastRecording: async () => {
+          const id = App.Audio.lastRecordingId;
+          if (!id) { App.Toast('No recording to share.'); return; }
+
+          let blob = App.State.audioBlobs[id];
+          if (!blob) {
+            try {
+              const record = await App.AudioDB.getBlob(id);
+              if (record) blob = record.blob;
+            } catch (err) { console.error(err); }
+          }
+          if (!blob) { App.Toast('Audio file not available.'); return; }
+
+          const mime = App.Audio.lastRecordingMime || blob.type || 'audio/webm';
+          const ext = mime.includes('mp4') ? 'm4a' : 'webm';
+          const filename = `${id}.${ext}`;
+
+          if (navigator.share && navigator.canShare) {
+            const file = new File([blob], filename, { type: mime });
+            const shareData = { files: [file], title: `Audio Recording` };
+            if (navigator.canShare(shareData)) {
+              try {
+                await navigator.share(shareData);
+                App.Toast('Audio shared!');
+                return;
+              } catch (err) { console.log('Share cancelled:', err); }
+            }
+          }
+          // Fallback: download
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = filename; a.click();
+          URL.revokeObjectURL(url);
+          App.Toast(`Downloaded: ${filename}. Send via WhatsApp manually.`);
+        },
 
         toggle: async (mode) => {
           // Map float mode to the actual current tab
@@ -3182,6 +3234,10 @@
               const recorderOptions = mimeType ? { mimeType } : {};
               App.Audio.mediaRecorder = new MediaRecorder(stream, recorderOptions);
               App.Audio.chunks = [];
+
+              // Hide previous download/share buttons when starting new recording
+              const actionsEl = App.$('floatingRecorderActions');
+              if (actionsEl) actionsEl.style.display = 'none';
 
               App.Audio.mediaRecorder.ondataavailable = e => App.Audio.chunks.push(e.data);
               App.Audio.mediaRecorder.onstop = () => App.Audio.saveRecording(App.Audio.currentMode);
@@ -3324,7 +3380,14 @@
           }
 
           App.$('statusFloat').textContent = "Saved!";
-          App.Toast("Audio Recorded & Saved locally!");
+
+          // Show download & share buttons
+          App.Audio.lastRecordingId = id;
+          App.Audio.lastRecordingMime = actualMime;
+          const actionsEl = App.$('floatingRecorderActions');
+          if (actionsEl) actionsEl.style.display = 'flex';
+
+          App.Toast("Audio Saved! Download or share via WhatsApp below.");
 
           // Attempt background upload
           if (navigator.onLine) {
@@ -3789,6 +3852,9 @@
                 ${hasBlob ?
                 `<button class="btn btn-outline btn-sm" onclick="App.Data.downloadAudio('${r.id}')" title="Download">
                     <i class="bi bi-download"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm" onclick="App.Data.shareAudioWhatsApp('${r.id}')" title="Share via WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
                   </button>` :
                 `<span class="badge" style="background: var(--bg-alt);">Not available</span>`
               }
@@ -3817,17 +3883,55 @@
 
           if (!blob) return alert("Audio file not available.");
 
-          // Download format: participantID_site_date
+          // Get correct extension from MIME type
+          const rec = App.State.audioRecordings.find(r => r.id === id);
+          const mime = (rec && rec.mimeType) || blob.type || 'audio/webm';
+          const ext = mime.includes('mp4') ? 'm4a' : 'webm';
           const downloadName = id;
 
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `${downloadName}.webm`;
+          a.download = `${downloadName}.${ext}`;
           a.click();
           URL.revokeObjectURL(url);
 
-          console.log(`✅ Downloaded: ${downloadName}.webm`);
+          App.Toast(`Downloaded: ${downloadName}.${ext}`);
+          console.log(`✅ Downloaded: ${downloadName}.${ext}`);
+        },
+
+        shareAudioWhatsApp: async (id) => {
+          let blob = App.State.audioBlobs[id];
+          if (!blob) {
+            try {
+              const record = await App.AudioDB.getBlob(id);
+              if (record) blob = record.blob;
+            } catch (err) { console.error(err); }
+          }
+          if (!blob) { App.Toast('Audio file not available.'); return; }
+
+          const rec = App.State.audioRecordings.find(r => r.id === id);
+          const mime = (rec && rec.mimeType) || blob.type || 'audio/webm';
+          const ext = mime.includes('mp4') ? 'm4a' : 'webm';
+          const filename = `${id}.${ext}`;
+
+          if (navigator.share && navigator.canShare) {
+            const file = new File([blob], filename, { type: mime });
+            const shareData = { files: [file], title: `Audio - ${id}` };
+            if (navigator.canShare(shareData)) {
+              try {
+                await navigator.share(shareData);
+                App.Toast('Audio shared!');
+                return;
+              } catch (err) { console.log('Share cancelled:', err); }
+            }
+          }
+          // Fallback: download
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = filename; a.click();
+          URL.revokeObjectURL(url);
+          App.Toast(`Downloaded: ${filename}. Send via WhatsApp manually.`);
         },
 
         uploadAudio: async (id, silent = false) => {
