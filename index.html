@@ -894,6 +894,52 @@
       justify-content: center;
       gap: var(--space-sm);
       margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    /* Interview Action Buttons */
+    .interview-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .interview-actions .btn {
+      flex: 1;
+      min-height: 52px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .interview-actions-right {
+      display: flex;
+      gap: var(--space-md);
+      flex: 1;
+    }
+
+    .interview-actions-right .btn {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      .interview-actions {
+        flex-wrap: wrap;
+        flex-direction: column;
+      }
+
+      .interview-actions .btn {
+        width: 100%;
+      }
+
+      .interview-actions-right {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .interview-actions-right .btn {
+        width: 100%;
+      }
     }
 
     .floating-recorder-status {
@@ -938,6 +984,29 @@
 
     .floating-recorder-minimize-btn.visible {
       display: flex;
+    }
+
+    @media (max-width: 768px) {
+      .floating-recorder-buttons .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .floating-recorder-buttons .bi {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .floating-recorder-buttons .btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        min-width: auto;
+      }
+
+      .floating-recorder-buttons .btn i {
+        margin-right: 4px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -1359,13 +1428,13 @@
                 <textarea class="form-control" id="idiNotes" rows="6"
                   placeholder="Interview transcript/notes..."></textarea>
               </div>
-              <div class="d-flex justify-content-between gap-2">
-                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1rem; padding: 12px 20px;">
-                  <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+              <div class="interview-actions">
+                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')">
+                  <i class="bi bi-arrow-left me-2"></i>Back
                 </button>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline" onclick="App.Interview.save('idi')">Save Draft</button>
-                  <button class="btn btn-primary" onclick="App.Interview.complete('idi')">Complete</button>
+                <div class="interview-actions-right">
+                  <button class="btn btn-outline" onclick="App.Interview.save('idi')"><i class="bi bi-cloud-check me-1"></i>Save Draft</button>
+                  <button class="btn btn-primary" onclick="App.Interview.complete('idi')"><i class="bi bi-check-circle me-1"></i>Complete</button>
                 </div>
               </div>
             </div>
@@ -1408,13 +1477,13 @@
               <div class="mb-3">
                 <textarea class="form-control" id="fgdNotes" rows="5" placeholder="FGD Notes..."></textarea>
               </div>
-              <div class="d-flex justify-content-between gap-2">
-                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')" style="font-size: 1rem; padding: 12px 20px;">
-                  <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+              <div class="interview-actions">
+                <button type="button" class="btn btn-outline" onclick="App.switchSection('dashboard')">
+                  <i class="bi bi-arrow-left me-2"></i>Back
                 </button>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline" onclick="App.Interview.save('fgd')">Save Draft</button>
-                  <button class="btn btn-primary" onclick="App.Interview.complete('fgd')">Complete</button>
+                <div class="interview-actions-right">
+                  <button class="btn btn-outline" onclick="App.Interview.save('fgd')"><i class="bi bi-cloud-check me-1"></i>Save Draft</button>
+                  <button class="btn btn-primary" onclick="App.Interview.complete('fgd')"><i class="bi bi-check-circle me-1"></i>Complete</button>
                 </div>
               </div>
             </div>
