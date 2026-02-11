@@ -490,6 +490,120 @@
       display: flex;
     }
 
+    /* Install Banner */
+    .install-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, #0a9688 100%);
+      color: white;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      animation: slideDown 0.3s ease;
+    }
+
+    .install-banner.show {
+      display: flex;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .install-banner-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .install-banner-content i {
+      font-size: 1.5rem;
+    }
+
+    .install-banner-text h6 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .install-banner-text p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.95;
+    }
+
+    .install-banner-actions {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .install-banner-actions .btn {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: auto;
+    }
+
+    .install-banner-actions .btn-install {
+      background: white;
+      color: var(--primary);
+    }
+
+    .install-banner-actions .btn-install:hover {
+      background: #f0f0f0;
+      transform: translateY(-1px);
+    }
+
+    .install-banner-actions .btn-dismiss {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    .install-banner-actions .btn-dismiss:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    @media (max-width: 576px) {
+      .install-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+      }
+
+      .install-banner-text p {
+        font-size: 0.8rem;
+      }
+
+      .install-banner-actions {
+        width: 100%;
+      }
+
+      .install-banner-actions .btn {
+        flex: 1;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+      }
+    }
+
     .toast {
       background: var(--primary);
       color: white;
@@ -1113,6 +1227,25 @@
 </head>
 
 <body>
+  <!-- Install App Banner -->
+  <div class="install-banner" id="installBanner">
+    <div class="install-banner-content">
+      <i class="bi bi-download"></i>
+      <div class="install-banner-text">
+        <h6>Install UHAS Toolkit A</h6>
+        <p>Install this app on your device for faster access and offline use</p>
+      </div>
+    </div>
+    <div class="install-banner-actions">
+      <button class="btn btn-install" id="installBtn">
+        <i class="bi bi-plus-circle me-1"></i>Install
+      </button>
+      <button class="btn btn-dismiss" id="dismissInstallBtn">
+        <i class="bi bi-x"></i>Not now
+      </button>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="app-header">
     <div class="container">
@@ -3814,6 +3947,57 @@
     window.addEventListener('DOMContentLoaded', () => {
       App.init();
     });
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    const installBanner = document.getElementById('installBanner');
+    const installBtn = document.getElementById('installBtn');
+    const dismissBtn = document.getElementById('dismissInstallBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Check if user previously dismissed
+      const dismissed = localStorage.getItem('installBannerDismissed');
+      if (!dismissed) {
+        // Show the install banner
+        installBanner.classList.add('show');
+      }
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        return;
+      }
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // Clear the deferredPrompt
+      deferredPrompt = null;
+      // Hide the banner
+      installBanner.classList.remove('show');
+    });
+
+    dismissBtn.addEventListener('click', () => {
+      // Hide the banner
+      installBanner.classList.remove('show');
+      // Remember dismissal for 7 days
+      const dismissedUntil = Date.now() + (7 * 24 * 60 * 60 * 1000);
+      localStorage.setItem('installBannerDismissed', dismissedUntil);
+    });
+
+    // Check if banner was dismissed and time has passed
+    const checkDismissal = () => {
+      const dismissed = localStorage.getItem('installBannerDismissed');
+      if (dismissed && Date.now() > parseInt(dismissed)) {
+        localStorage.removeItem('installBannerDismissed');
+      }
+    };
+    checkDismissal();
   </script>
 
   <!-- Offline-First Data Management -->
