@@ -447,13 +447,35 @@
       padding: 6px 10px;
       font-size: 0.85rem;
       min-width: auto;
-      flex: 1 1 calc(50% - 4px);
+      flex: 1 1 calc(33.33% - 6px);
       min-height: 44px;
+    }
+
+    .record-actions .btn-warning {
+      background: #f0ad4e;
+      color: white;
+      border-color: #f0ad4e;
+    }
+
+    .record-actions .btn-warning:hover {
+      background: #ec971f;
+      border-color: #ec971f;
+    }
+
+    .record-actions .btn-danger {
+      background: #d9534f;
+      color: white;
+      border-color: #d9534f;
+    }
+
+    .record-actions .btn-danger:hover {
+      background: #c9302c;
+      border-color: #c9302c;
     }
 
     @media (max-width: 480px) {
       .record-actions .btn {
-        flex: 1 1 100%;
+        flex: 1 1 calc(50% - 4px);
         font-size: 0.9rem;
         padding: 8px 12px;
       }
@@ -3521,6 +3543,12 @@
                   <button class="btn btn-info" title="Share Data via WhatsApp" onclick="App.Records.shareWhatsApp('${pid}')">
                     <i class="bi bi-whatsapp me-2"></i>Data
                   </button>
+                  <button class="btn btn-warning" title="Edit Participant" onclick="App.Records.editRecord('${pid}')">
+                    <i class="bi bi-pencil-square me-2"></i>Edit
+                  </button>
+                  <button class="btn btn-danger" title="Delete Participant" onclick="App.Records.deleteRecord('${pid}')">
+                    <i class="bi bi-trash me-2"></i>Delete
+                  </button>
                 </div>
               </div>
             `;
@@ -3619,6 +3647,57 @@
           a.click();
           URL.revokeObjectURL(url);
           App.Toast(`Downloaded: ${filename}. Send via WhatsApp manually.`);
+        },
+
+        editRecord: (participantId) => {
+          const participant = App.State.participants.find(p => p.id === participantId);
+          if (!participant) {
+            App.Toast('Participant not found.');
+            return;
+          }
+          App.switchSection('screening');
+          App.Screening.loadForEdit(participant);
+        },
+
+        deleteRecord: async (participantId) => {
+          const participant = App.State.participants.find(p => p.id === participantId);
+          if (!participant) {
+            App.Toast('Participant not found.');
+            return;
+          }
+          if (!confirm(`Are you sure you want to delete ${participant.name} (${participant.id})?\n\nThis will also remove all associated interviews and audio recordings. This cannot be undone.`)) return;
+
+          // Remove from state
+          App.State.participants = App.State.participants.filter(p => p.id !== participantId);
+          App.State.interviews = App.State.interviews.filter(i => i.participantId !== participantId);
+          App.State.audioRecordings = App.State.audioRecordings.filter(a => a.participantId !== participantId);
+
+          // Remove from IndexedDB
+          if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
+            try {
+              await UhasIDB.delete('participants', participantId);
+              // Delete associated interviews
+              const allInterviews = await UhasIDB.getAll('interviews');
+              for (const interview of allInterviews) {
+                if (interview.participantId === participantId) {
+                  await UhasIDB.delete('interviews', interview.id);
+                }
+              }
+              // Delete associated audio recordings
+              const allAudio = await UhasIDB.getAll('audioRecordings');
+              for (const audio of allAudio) {
+                if (audio.participantId === participantId) {
+                  await UhasIDB.delete('audioRecordings', audio.id);
+                }
+              }
+            } catch (err) {
+              console.error('Failed to delete from IDB:', err);
+            }
+          }
+
+          App.Storage.save();
+          App.Records.render();
+          App.Toast(`${participant.name} deleted successfully.`);
         },
 
         startInterview: (participantId) => {
