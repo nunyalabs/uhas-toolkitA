@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // UHAS Toolkit A - Data & Audio metadata
+    match /toolkita/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

@@ -3,7 +3,7 @@
    Complete offline-first PWA with IndexedDB storage
    ============================================ */
 
-const CACHE_VERSION = 'uhas-toolkit-a-v1';
+const CACHE_VERSION = 'uhas-toolkit-a-v2';
 const CACHE_ASSETS = [
   './',
   './index.html',
@@ -42,7 +42,8 @@ const CACHE_ASSETS = [
   './assets/js/idb-manager.js',
   './assets/js/import-export.js',
   './assets/js/participant.js',
-  './assets/js/sw-updater.js'
+  './assets/js/sw-updater.js',
+  './assets/js/firebase-sync.js'
 ];
 
 // Install event - cache essential assets

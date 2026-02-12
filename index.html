@@ -963,6 +963,47 @@
       background: var(--danger);
     }
 
+    /* Firebase Sync Badge */
+    .firebase-sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .firebase-sync-badge.idle {
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+    }
+    .firebase-sync-badge.syncing {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    .firebase-sync-badge.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .firebase-sync-badge.error {
+      background: #fce4ec;
+      color: #c62828;
+    }
+    .firebase-sync-badge:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-sm);
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .firebase-sync-badge .spin {
+      animation: spin 1s linear infinite;
+    }
+
     /* Floating Audio Recorder */
     .floating-recorder {
       position: fixed;
@@ -1150,17 +1191,22 @@
         width: 100%;
         right: 0;
         left: 0;
-        top: 0;
-        bottom: auto;
-        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        top: auto;
+        bottom: 0;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        border: none;
+        border-top: 3px solid var(--primary);
+        padding: var(--space-sm) var(--space-md);
+        max-height: 45vh;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
       }
 
       .floating-recorder-minimize-btn {
-        bottom: 30px;
-        right: 30px;
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
+        bottom: 70px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
       }
     }
 
@@ -1285,7 +1331,10 @@
       </button>
 
       <div class="header-nav" id="headerNav">
-        <!-- Removed Online, Back, and Home icons -->
+        <!-- Firebase Cloud Sync Badge -->
+        <div id="firebaseSyncStatus" class="firebase-sync-badge idle" onclick="FirebaseSync.showSyncDetails()" title="Cloud Sync Status">
+          <i class="bi bi-cloud"></i> Cloud
+        </div>
       </div>
     </div>
   </header>
@@ -1531,30 +1580,31 @@
       <!-- Floating Audio Recorder -->
       <div class="floating-recorder" id="floatingRecorder">
         <div class="floating-recorder-header">
-          <h6><i class="bi bi-mic-fill me-2"></i>Audio Recorder</h6>
-          <button onclick="App.Interview.minimizeFloatingRecorder()" title="Minimize" style="cursor: pointer;">
+          <h6><i class="bi bi-mic-fill me-2"></i>Recorder</h6>
+          <button onclick="App.Interview.minimizeFloatingRecorder()" title="Minimize" style="cursor:pointer;">
             <i class="bi bi-dash"></i>
           </button>
         </div>
         <div class="floating-recorder-content">
-          <div class="floating-recorder-buttons">
-            <button class="btn btn-success rounded-pill" id="btnRecFloat" onclick="App.Audio.toggle('float')" style="padding: 12px 20px; font-size: 1rem; font-weight: 600;">
+          <div class="floating-recorder-buttons" style="gap:8px;">
+            <button class="btn btn-success rounded-pill" id="btnRecFloat" onclick="App.Audio.toggle('float')" style="padding:14px 24px; font-size:1.1rem; font-weight:700; min-height:52px; flex:1;">
               <i class="bi bi-record-circle"></i> Record
             </button>
-            <button class="btn btn-danger rounded-pill" id="btnPauseFloat" onclick="App.Audio.pause('float')" disabled style="padding: 12px 20px; font-size: 1rem; font-weight: 600;">
-              <i class="bi bi-pause"></i> Pause
+            <button class="btn btn-danger rounded-pill" id="btnPauseFloat" onclick="App.Audio.pause('float')" disabled style="padding:14px 20px; font-size:1.1rem; font-weight:700; min-height:52px;">
+              <i class="bi bi-pause"></i>
             </button>
           </div>
-          <div class="floating-recorder-status" id="statusFloat">Ready</div>
+          <div class="floating-recorder-status" id="statusFloat" style="font-size:0.85rem;margin-top:8px;">Ready — tap Record to start</div>
           <audio id="playerFloat" class="floating-recorder-player" style="display:none;"></audio>
-          <div id="floatingRecorderActions" style="display:none; margin-top: 10px; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-outline btn-sm rounded-pill" id="btnDownloadFloat" onclick="App.Audio.downloadLastRecording()" style="flex:1; min-width: 120px;">
-              <i class="bi bi-download me-1"></i>Download
+          <div id="floatingRecorderActions" style="display:none; margin-top:8px; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm rounded-pill" id="btnDownloadFloat" onclick="App.Audio.downloadLastRecording()" style="flex:1; min-width:100px; min-height:44px;">
+              <i class="bi bi-download me-1"></i>Save Again
             </button>
-            <button class="btn btn-success btn-sm rounded-pill" id="btnShareFloat" onclick="App.Audio.shareLastRecording()" style="flex:1; min-width: 120px;">
-              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            <button class="btn btn-success btn-sm rounded-pill" id="btnShareFloat" onclick="App.Audio.shareLastRecording()" style="flex:1; min-width:100px; min-height:44px;">
+              <i class="bi bi-whatsapp me-1"></i>Share
             </button>
           </div>
+          <p style="font-size:0.7rem;color:var(--text-secondary);margin:6px 0 0;text-align:center;">Auto-downloads & syncs to cloud on stop</p>
         </div>
       </div>
 
@@ -1659,25 +1709,28 @@
     <!-- 5. DATA SECTION -->
     <div id="data" class="content-section">
       <div class="content-box">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4 class="mb-0"><i class="bi bi-database me-2"></i>Data Management</h4>
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary btn-sm" onclick="DataManager.importData()" title="Import JSON or CSV">
-              <i class="bi bi-upload me-1"></i> Import
-            </button>
-            <button class="btn btn-outline-success btn-sm" onclick="DataManager.exportAllJSON()" title="Export all data as JSON">
-              <i class="bi bi-download me-1"></i> Export JSON
-            </button>
-            <button class="btn btn-outline-success btn-sm" onclick="DataManager.exportAllCSV()" title="Export as CSV">
-              <i class="bi bi-download me-1"></i> Export CSV
-            </button>
-          </div>
+        <div class="d-flex justify-content-between align-items-center mb-3" style="flex-wrap:wrap;gap:8px;">
+          <h4 class="mb-0" style="font-size:1.3rem;"><i class="bi bi-database me-2"></i>Data Management</h4>
+          <button class="btn btn-primary btn-sm" onclick="FirebaseSync.manualSync()" style="padding:8px 16px;font-weight:600;border-radius:10px;">
+            <i class="bi bi-cloud-upload me-1"></i> Sync All
+          </button>
         </div>
 
-        <!-- Offline Data Sharing Info -->
-        <div class="alert mb-4" style="background: var(--primary); border: none; color: white; padding: 16px; border-radius: 8px;">
-          <h5 style="margin-bottom: 8px; color: white;"><i class="bi bi-phone me-2"></i>📱 Data Sharing</h5>
-          <p style="margin: 0; font-size: 0.95rem; color: white;">All data is stored <strong>locally on your device</strong>. To share responses, export as JSON/CSV and audio files, then send directly to my WhatsApp.</p>
+        <!-- Auto-sync info -->
+        <div class="alert mb-3" style="background:linear-gradient(135deg,var(--primary),#0aa68e);border:none;color:white;padding:14px 16px;border-radius:10px;">
+          <p style="margin:0;font-size:0.9rem;"><i class="bi bi-check-circle me-1"></i> <strong>Auto Mode:</strong> Data & audio auto-download to device and auto-sync to Firebase when online. No manual steps needed.</p>
+        </div>
+
+        <div class="d-flex gap-2 mb-3" style="flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="DataManager.exportAllJSON()" style="border-radius:8px;">
+            <i class="bi bi-download me-1"></i> Export JSON
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="DataManager.exportAllCSV()" style="border-radius:8px;">
+            <i class="bi bi-download me-1"></i> Export CSV
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="DataManager.importData()" style="border-radius:8px;">
+            <i class="bi bi-upload me-1"></i> Import
+          </button>
         </div>
 
         <ul class="nav nav-pills mb-3" id="dataTabs">
@@ -1716,6 +1769,17 @@
       </div>
     </div>
   </main>
+
+  <!-- Firebase Sync Details Modal -->
+  <div id="firebaseSyncModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border-radius:var(--radius-lg); padding:24px; max-width:420px; width:100%; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-lg); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; font-size:1.1rem;"><i class="bi bi-cloud-arrow-up"></i> Cloud Sync</h3>
+        <button onclick="document.getElementById('firebaseSyncModal').style.display='none'" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+      </div>
+      <div id="syncDetailContent">Loading...</div>
+    </div>
+  </div>
 
   <!-- Toast Notification -->
   <div class="toast-container">
@@ -1871,6 +1935,17 @@
         this.Screening.initListeners();
         this.Dashboard.update();
         this.SyncStatus.init();
+
+        // Initialize Firebase sync
+        try {
+          if (typeof FirebaseSync !== 'undefined') {
+            await FirebaseSync.init();
+            console.log('\u2705 Firebase sync module initialized');
+          }
+        } catch (err) {
+          console.warn('Firebase sync init failed (app works offline):', err);
+        }
+
         console.log("Toolkit A Initialized");
       },
 
@@ -1929,6 +2004,11 @@
             // localStorage.setItem('toolkit_a_backup', JSON.stringify({ timestamp: Date.now() }));
 
             App.Dashboard.update();
+
+            // Trigger Firebase sync after saving
+            if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized && navigator.onLine) {
+              setTimeout(() => FirebaseSync.syncAll(), 1000);
+            }
 
           } catch (error) {
             console.error('Storage save failed:', error);
@@ -2218,10 +2298,37 @@
           if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
             UhasIDB.put('participants', participant).then(() => {
               console.log('✅ Participant saved to IDB');
-            }).catch(err => console.error('❌ Failed to save participant to IDB', err));
+            }).catch(err => console.error('Failed to save participant to IDB', err));
           }
 
           App.Storage.save();
+
+          // === AUTO-DOWNLOAD participant JSON ===
+          try {
+            const siteName = siteValue.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 25);
+            const dStr = new Date().toISOString().split('T')[0];
+            const jsonFilename = `${participant.id}_${siteName}_${dStr}.json`;
+            const jsonBlob = new Blob([JSON.stringify(participant, null, 2)], { type: 'application/json' });
+            const jsonUrl = URL.createObjectURL(jsonBlob);
+            const dlLink = document.createElement('a');
+            dlLink.href = jsonUrl;
+            dlLink.download = jsonFilename;
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            document.body.removeChild(dlLink);
+            URL.revokeObjectURL(jsonUrl);
+            console.log('✅ Participant auto-downloaded:', jsonFilename);
+          } catch (dlErr) {
+            console.warn('Auto-download failed:', dlErr);
+          }
+
+          // === AUTO-SYNC to Firebase ===
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized && navigator.onLine) {
+            FirebaseSync.uploadSingleRecord('participants', participant).then(ok => {
+              if (ok) console.log('✅ Participant synced to Firebase');
+            });
+          }
+
           App.Screening.clearForm();
           App.Participants.render();
           App.switchSection('records');
@@ -2302,535 +2409,220 @@
 
         renderIdiGuide: (type) => {
           const guides = {
-            patient: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-person-heart me-2'></i>Patient Survey-Based Interview Guide</h6>
-              <p class='alert alert-info small mb-3'><i class='bi bi-info-circle me-1'></i><strong>Note:</strong> This is a conversational interview guide based on our survey questionnaire. Ask questions naturally, probe for details, and let the participant elaborate.</p>
+            patient: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-person-heart me-2'></i>Patient Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>5 minutes total</strong> — Allow ~1 minute per question. Keep it conversational.</p>
               
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION A: DEMOGRAPHIC INFORMATION (3-5 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Let's start with some basic information about yourself:
-                    <ul class='small'>
-                      <li>A1. What age group are you in? <em class='text-muted'>(18-24, 25-34, 35-44, 45-54, 55-64, 65+)</em></li>
-                      <li>A2. Gender?</li>
-                      <li>A3. What's your highest level of education? <em class='text-muted'>(No formal education, Primary, JHS, SHS, Tertiary, Other)</em></li>
-                      <li>A4. Current employment status? <em class='text-muted'>(Full-time, Part-time, Self-employed, Unemployed, Retired, Student)</em></li>
-                      <li>A5. Marital status? <em class='text-muted'>(Single, Married, Divorced/Separated, Widowed)</em></li>
-                    </ul>
-                  </li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q1. Diagnosis & Treatment Routine</strong>
+                <p class='small text-muted mb-1'><em>Covers Section A (Demographics) & Section B (Diagnosis/History)</em></p>
+                <p>"Can you start by telling me a little about your history with high blood pressure—specifically, how long ago were you diagnosed, where do you usually go for treatment, and what is your current daily routine for taking medication?"</p>
+                <p class='small text-muted'><i class='bi bi-ear me-1'></i><strong>Listen for:</strong> Duration of illness, facility type (Government vs. Private/Herbal), and current adherence to prescribed meds.</p>
               </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION B: HYPERTENSION DIAGNOSIS & TREATMENT HISTORY (12-15 mins)</strong>
-                <ol class='ps-3'>
-                  <li><strong>B1.</strong> How long ago were you diagnosed with hypertension? <em class='text-muted'>(Less than 6 months, 6mo-1yr, 1-3yrs, 3-5yrs, More than 5yrs)</em>
-                    <ul class='small text-muted'><li>Probe: Tell me about that day - how did you feel? What were you told?</li></ul>
-                  </li>
-                  <li><strong>B2.</strong> Where do you usually receive treatment for your blood pressure? <em class='text-muted'>(Can select multiple)</em>
-                    <ul class='small'>
-                      <li>Government hospital/clinic?</li>
-                      <li>Private hospital/clinic?</li>
-                      <li>Community health center (CHPS)?</li>
-                      <li>Pharmacy?</li>
-                      <li>Herbal practitioner?</li>
-                      <li>Faith healer/spiritual center?</li>
-                      <li>Self-medication at home?</li>
-                      <li>Other?</li>
-                    </ul>
-                    <ul class='small text-muted'><li>Probe: Why did you choose these places? How often do you go?</li></ul>
-                  </li>
-                  <li><strong>B3.</strong> Are you currently taking prescribed medication for hypertension? <em class='text-muted'>(Yes/No)</em>
-                    <ul class='small text-muted'><li>If No: Why not? What are you doing instead?</li></ul>
-                  </li>
-                  <li><strong>B4.</strong> [If taking medication] In the past month, how often did you take your prescribed medication as directed?
-                    <ul class='small'><li>Every day (100%)? Most days (75-99%)? Sometimes (50-74%)? Rarely (25-49%)? Never (0-24%)?</li></ul>
-                    <ul class='small text-muted'><li>Probe: Be honest - no judgment. This helps us understand real challenges.</li></ul>
-                  </li>
-                  <li><strong>B5.</strong> What are the main reasons you sometimes miss taking your medication? <em class='text-muted'>(Select all that apply)</em>
-                    <ul class='small'>
-                      <li>Forget to take it?</li>
-                      <li>Cost too high?</li>
-                      <li>Medication finished/not available?</li>
-                      <li>Side effects?</li>
-                      <li>Feeling better/no symptoms?</li>
-                      <li>Distance to health facility?</li>
-                      <li>Using herbal remedies instead?</li>
-                      <li>Other reasons?</li>
-                    </ul>
-                    <ul class='small text-muted'><li>Probe: Tell me more about that. How does this affect your BP control?</li></ul>
-                  </li>
-                  <li><strong>B6.</strong> Do you currently use any herbal or traditional remedies for your blood pressure? <em class='text-muted'>(Yes/No)</em></li>
-                  <li><strong>B7.</strong> [If yes] Which herbal remedies do you use?
-                    <ul class='small'>
-                      <li>Garlic? Ginger? Neem leaves? Moringa? Bitter leaf?</li>
-                      <li>African star apple (Alasa)? Mixture from herbalist? Other?</li>
-                    </ul>
-                    <ul class='small text-muted'><li>Probe: How do you prepare them? Who taught you? Do they help?</li></ul>
-                  </li>
-                  <li><strong>B8.</strong> [If using herbs] How often do you use these herbal remedies?
-                    <ul class='small'><li>Daily? Several times per week? Once a week? Occasionally? Only when symptoms worsen?</li></ul>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION C: BELIEFS & ATTITUDES (8-10 mins)</strong>
-                <p class='small text-muted mb-2'><em>For each statement, ask: Do you strongly agree, agree, neutral, disagree, or strongly disagree? (Scale 1-5)</em></p>
-                <ol class='ps-3'>
-                  <li><strong>C1.</strong> Hospital medications are effective for controlling my blood pressure</li>
-                  <li><strong>C2.</strong> Herbal remedies are effective for controlling my blood pressure</li>
-                  <li><strong>C3.</strong> Combining hospital medicine with herbs could work better than either alone
-                    <ul class='small text-muted'><li>Probe: Why do you think so? Have you tried this?</li></ul>
-                  </li>
-                  <li><strong>C4.</strong> I trust my doctor/nurse to make the best treatment decisions for me</li>
-                  <li><strong>C5.</strong> I trust herbal practitioners to treat my blood pressure safely</li>
-                  <li><strong>C6.</strong> Spiritual/religious practices help control blood pressure
-                    <ul class='small text-muted'><li>Probe: Tell me about that. What practices?</li></ul>
-                  </li>
-                  <li><strong>C7.</strong> My blood pressure problem is caused by stress and worry</li>
-                  <li><strong>C8.</strong> My blood pressure problem is hereditary (runs in family)</li>
-                  <li><strong>C9.</strong> Diet and exercise can control blood pressure without medication
-                    <ul class='small text-muted'><li>Probe: Have you tried this? What happened?</li></ul>
-                  </li>
-                  <li><strong>C10.</strong> I am satisfied with my current blood pressure treatment</li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION D: COMMUNICATION WITH HEALTHCARE PROVIDERS (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li><strong>D1.</strong> Have you told your doctor about herbal remedies you use?
-                    <ul class='small'><li>Yes, told them everything? Yes, but only some? No, haven't told them? Not applicable - don't use herbs?</li></ul>
-                  </li>
-                  <li><strong>D2.</strong> [If haven't told] Why not? <em class='text-muted'>(Select all)</em>
-                    <ul class='small'>
-                      <li>They didn't ask?</li>
-                      <li>Afraid they would disapprove?</li>
-                      <li>Don't think it's important?</li>
-                      <li>Don't think they would understand?</li>
-                    </ul>
-                    <ul class='small text-muted'><li>Probe: What do you think they would say if you told them?</li></ul>
-                  </li>
-                  <li><strong>D3.</strong> How comfortable are you discussing herbal treatments with your doctor?
-                    <ul class='small'><li>Very comfortable? Somewhat comfortable? Neutral? Somewhat uncomfortable? Very uncomfortable?</li></ul>
-                    <ul class='small text-muted'><li>Probe: Why do you feel this way? Has this always been the case?</li></ul>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION E: BARRIERS TO HYPERTENSION MANAGEMENT (7-9 mins)</strong>
-                <p class='small text-muted mb-2'><em>For each barrier, ask: How much does this affect your BP management? Not at all, A little, Moderately, Quite a bit, or Extremely? (Scale 1-5)</em></p>
-                <ol class='ps-3'>
-                  <li><strong>E1.</strong> Cost of medications</li>
-                  <li><strong>E2.</strong> Cost of clinic visits</li>
-                  <li><strong>E3.</strong> Distance to health facility</li>
-                  <li><strong>E4.</strong> Transport costs</li>
-                  <li><strong>E5.</strong> Long waiting times at clinic</li>
-                  <li><strong>E6.</strong> Medication side effects
-                    <ul class='small text-muted'><li>Probe: What side effects have you experienced?</li></ul>
-                  </li>
-                  <li><strong>E7.</strong> Forgetting to take medication
-                    <ul class='small text-muted'><li>Probe: What helps you remember? What makes you forget?</li></ul>
-                  </li>
-                  <li><strong>E8.</strong> Work/family commitments</li>
-                  <li><strong>E9.</strong> Medication not available at pharmacy</li>
-                  <li><strong>E10.</strong> Not understanding treatment instructions</li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION F: DIGITAL HEALTH & PERSONALIZED TREATMENT (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li><strong>F1.</strong> Do you own a smartphone? <em class='text-muted'>(Yes/No)</em></li>
-                  <li><strong>F2.</strong> [If yes] How comfortable are you using smartphone apps?
-                    <ul class='small'>
-                      <li>Very comfortable - use many apps daily?</li>
-                      <li>Comfortable - use a few apps regularly?</li>
-                      <li>Neutral - can use if taught?</li>
-                      <li>Uncomfortable - rarely use apps?</li>
-                      <li>Very uncomfortable - find apps difficult?</li>
-                    </ul>
-                  </li>
-                  <li><strong>F3.</strong> [If has smartphone] Have you ever used a mobile health app? <em class='text-muted'>(Yes/No)</em>
-                    <ul class='small text-muted'><li>If yes: Which one? Was it helpful? What did you like/dislike?</li></ul>
-                  </li>
-                  <li><strong>F4.</strong> Would you be willing to use a mobile app to track your BP, medications, and symptoms?
-                    <ul class='small'><li>Very willing? Somewhat willing? Neutral? Somewhat unwilling? Very unwilling?</li></ul>
-                    <ul class='small text-muted'><li>Probe: What would make you more willing? What concerns do you have?</li></ul>
-                  </li>
-                  <li><strong>F5.</strong> Would you be interested in participating in a study where different treatments are tried over time to find what works best for YOU?
-                    <ul class='small'><li>Very interested? Somewhat interested? Neutral? Somewhat uninterested? Very uninterested?</li></ul>
-                    <ul class='small text-muted'><li>Explain: This is called N-of-1 trial - testing what works for you personally</li></ul>
-                  </li>
-                  <li><strong>F6.</strong> If a mobile app could help identify which treatment works best for you personally, how valuable would that be?
-                    <ul class='small'><li>Extremely valuable? Very valuable? Moderately valuable? Slightly valuable? Not at all valuable?</li></ul>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>SECTION G: OPENNESS TO INTEGRATIVE CARE (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li><strong>G1.</strong> If your doctor recommended combining prescribed medication with specific herbal remedies, would you follow this advice?
-                    <ul class='small'><li>Definitely yes? Probably yes? Unsure? Probably no? Definitely no?</li></ul>
-                    <ul class='small text-muted'><li>Probe: Why or why not? What would you need to know first?</li></ul>
-                  </li>
-                  <li><strong>G2.</strong> Would you be comfortable if your doctor and a trained herbal practitioner worked together to manage your blood pressure?
-                    <ul class='small'><li>Very comfortable? Somewhat comfortable? Neutral? Somewhat uncomfortable? Very uncomfortable?</li></ul>
-                    <ul class='small text-muted'><li>Probe: What would this look like to you? How would it work?</li></ul>
-                  </li>
-                  <li><strong>G3.</strong> What concerns, if any, would you have about combining hospital medicine with herbal treatments? <em class='text-muted'>(Select all)</em>
-                    <ul class='small'>
-                      <li>Safety/harmful interactions?</li>
-                      <li>Effectiveness might be reduced?</li>
-                      <li>Too complicated to manage?</li>
-                      <li>Increased cost?</li>
-                      <li>What family/community might think?</li>
-                      <li>Religious/cultural concerns?</li>
-                      <li>No concerns?</li>
-                      <li>Other?</li>
-                    </ul>
-                    <ul class='small text-muted'><li>Probe: Tell me more about your biggest concern.</li></ul>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>CLOSING QUESTIONS (3-5 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Thinking about everything we've discussed, what's the ONE thing that would most help you manage your blood pressure better?</li>
-                  <li>If you could design your ideal hypertension care system, what would it include?</li>
-                  <li>Is there anything else about your experience with hypertension that you'd like to share?</li>
-                  <li>Do you have any questions for me?</li>
-                </ol>
-              </div>
-              
-              <div class='alert alert-success small mt-3'>
-                <p class='mb-2'><strong><i class='bi bi-check-circle me-1'></i>Interview Complete!</strong></p>
-                <ul class='mb-0 ps-3'>
-                  <li>Thank participant for their time and honest responses</li>
-                  <li>Remind about confidentiality</li>
-                  <li>Provide contact information for follow-up questions</li>
-                  <li>Discuss next steps (if applicable)</li>
-                </ul>
-              </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 60-75 minutes</p>`,
 
-            clinician: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-hospital me-2'></i>Clinician In-Depth Interview Guide</h6>
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>A. BACKGROUND & PRACTICE CONTEXT (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Tell me about your role and how long you've been practicing in this facility.</li>
-                  <li>Approximately how many hypertensive patients do you see each month?</li>
-                  <li>Describe the profile of a typical hypertensive patient in your practice (age, gender, socioeconomic status).</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q2. Barriers & Challenges</strong>
+                <p class='small text-muted mb-1'><em>Covers Section B (Adherence) & Section E (Barriers)</em></p>
+                <p>"We know it is not always easy to follow treatment plans perfectly. What are the biggest challenges that stop you from taking your medicine or visiting the clinic? Is it cost, forgetfulness, side effects, or something else?"</p>
+                <p class='small text-muted'><i class='bi bi-ear me-1'></i><strong>Listen for:</strong> Missed doses, financial constraints, distance, or side effects.</p>
               </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>B. HYPERTENSION MANAGEMENT & CHALLENGES (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Walk me through your typical approach to managing a newly diagnosed hypertensive patient.</li>
-                  <li>What are the biggest challenges you face in managing hypertension in your practice?</li>
-                  <li>How do you assess and monitor patient adherence to treatment? What strategies do you use?</li>
-                  <li>What factors do you think most affect whether patients take their medication regularly? <em class='text-muted'>(Probe: cost, education, beliefs, access)</em></li>
-                  <li>How often do you see patients with uncontrolled blood pressure despite being on medication? What do you think contributes to this?</li>
-                  <li>What resources or support do you feel you need to better manage hypertensive patients?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>C. HERBAL MEDICINE & INTEGRATION (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Do patients discuss herbal medicine use with you? How common is this?</li>
-                  <li>In your experience, what proportion of hypertensive patients use herbal remedies alongside or instead of conventional treatment?</li>
-                  <li>How do you respond when patients tell you they're using herbal medicines?</li>
-                  <li>What are your views on integrating herbal and conventional medicine for hypertension management?</li>
-                  <li>Have you observed any benefits or adverse effects from patients using both conventional and herbal treatments?</li>
-                  <li>What concerns, if any, do you have about patients using herbal medicines?</li>
-                  <li>Under what conditions would you be comfortable recommending or supporting herbal medicine use?</li>
-                  <li>How could collaboration between conventional healthcare and herbal practitioners be structured? What would be needed?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>D. DIGITAL HEALTH & INNOVATION (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What digital tools, if any, do you currently use in patient care? (EMR, mobile apps, telemedicine?)</li>
-                  <li>Have you ever recommended digital health tools to patients for self-management?</li>
-                  <li>What are your thoughts on using digital platforms for hypertension monitoring and management?</li>
-                  <li>What features would be most useful in a digital health tool for managing hypertensive patients?</li>
-                  <li>What barriers do you see to implementing digital health solutions in your practice?</li>
-                  <li>How could digital tools help address the herbal medicine integration question?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>E. POLICY & SYSTEMS (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What policies or guidelines currently govern herbal medicine use in your facility?</li>
-                  <li>What would need to change at the system level to enable better integration of conventional and herbal approaches?</li>
-                  <li>What role should research play in determining best practices for integrative hypertension management?</li>
-                  <li>If you could design an ideal system for managing hypertension that incorporates both approaches, what would it look like?</li>
-                  <li>Any additional thoughts on improving hypertension care in Ghana?</li>
-                </ol>
-              </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 45-50 minutes</p>`,
 
-            herbalist: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-flower1 me-2'></i>Herbalist/Traditional Healer Interview Guide</h6>
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>A. BACKGROUND & PRACTICE (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Tell me about your training and experience as an herbalist/traditional healer. How long have you been practicing?</li>
-                  <li>How did you learn about herbal medicine? <em class='text-muted'>(Probe: family tradition, apprenticeship, formal training)</em></li>
-                  <li>Describe your typical practice setting. Where do you see patients? How many patients do you see weekly/monthly?</li>
-                  <li>What are the most common conditions you treat? How common is hypertension among your patients?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q3. Beliefs: Hospital vs. Herbal Medicine</strong>
+                <p class='small text-muted mb-1'><em>Covers Section B (Herbal Use) & Section C (Beliefs)</em></p>
+                <p>"Many people rely on both hospital medicine and traditional remedies. Do you currently use any herbal treatments (like garlic, ginger, or mixtures), and truthfully, which type of treatment do you trust more to control your pressure?"</p>
+                <p class='small text-muted'><i class='bi bi-ear me-1'></i><strong>Listen for:</strong> Specific herbs used (Garlic, Neem, etc.), trust levels in doctors vs. herbal practitioners.</p>
               </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>B. HERBAL TREATMENT FOR HYPERTENSION (12-15 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What herbs or herbal preparations do you use for treating high blood pressure? Can you list them?</li>
-                  <li>For each main herb: How do you prepare it? What dosage do you recommend? How long should patients take it?</li>
-                  <li>How do you diagnose or know when someone has high blood pressure? What signs do you look for?</li>
-                  <li>Do you use blood pressure devices? If yes, how often? If no, why not?</li>
-                  <li>How do you determine if your treatment is working? What changes do you expect to see?</li>
-                  <li>How long does it typically take for your herbal treatments to show effects?</li>
-                  <li>What is your success rate with treating hypertension? How do you measure this?</li>
-                  <li>Have you ever had cases where herbal treatment didn't work? What did you do?</li>
-                  <li>Are there any side effects from the herbs you use? How do you manage them?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>C. INTERACTION WITH CONVENTIONAL MEDICINE (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Do you have patients who also take hospital medication for blood pressure? How common is this?</li>
-                  <li>What do you advise patients who are already on conventional medicine? Should they continue both or choose one?</li>
-                  <li>Have you observed any interactions (good or bad) between herbal and hospital medicines?</li>
-                  <li>Do you ever refer patients to hospitals or clinics? Under what circumstances?</li>
-                  <li>Have you ever collaborated with doctors, nurses, or other healthcare workers? Tell me about that experience.</li>
-                  <li>What is your relationship with the conventional healthcare system? <em class='text-muted'>(Probe: attitudes, barriers, opportunities)</em></li>
-                  <li>What are your views on working together with conventional healthcare providers?</li>
-                  <li>What would make you comfortable or willing to collaborate more closely with hospitals/clinics?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>D. KNOWLEDGE DOCUMENTATION & SHARING (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>How do you document your treatments and patient outcomes? Do you keep records?</li>
-                  <li>Are you willing to share your herbal knowledge with researchers or healthcare professionals? What concerns might you have?</li>
-                  <li>What would need to happen for herbal medicine to be more recognized and integrated into the mainstream health system?</li>
-                  <li>Would you be interested in receiving training on topics like blood pressure measurement or patient monitoring?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>E. TECHNOLOGY & FUTURE COLLABORATION (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Do you use any technology in your practice? (mobile phone, smartphone, computer?)</li>
-                  <li>Would you be interested in using a digital tool to track patient outcomes or share information with healthcare teams?</li>
-                  <li>If there was a platform that connected herbal practitioners with conventional healthcare providers, would you participate? What would you want from such a system?</li>
-                  <li>What do you see as the future of herbal medicine in Ghana's healthcare system?</li>
-                  <li>Any other thoughts on how we can better serve patients with high blood pressure?</li>
-                </ol>
-              </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 45-55 minutes</p>`,
 
-            caregiver: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-person-hearts me-2'></i>Caregiver In-Depth Interview Guide</h6>
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>A. BACKGROUND & CAREGIVING ROLE (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Tell me about the person you care for. What is your relationship to them?</li>
-                  <li>How long have you been helping them manage their hypertension?</li>
-                  <li>Describe your typical caregiving responsibilities. What does a normal day look like?</li>
-                  <li>Do you have other caregiving responsibilities or is this your primary role?</li>
-                  <li>How has being a caregiver affected your own life? (work, family, health, etc.)</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q4. Communication with Doctors</strong>
+                <p class='small text-muted mb-1'><em>Covers Section D (Communication) & Section G (Integrative Care)</em></p>
+                <p>"Have you told your doctor about any herbal remedies you use? If not, why? Also, how would you feel if your doctor and a herbal practitioner worked together to manage your health?"</p>
+                <p class='small text-muted'><i class='bi bi-ear me-1'></i><strong>Listen for:</strong> Disclosure of herbal use, fear of disapproval, openness to "Shared Care" models.</p>
               </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>B. MEDICATION MANAGEMENT SUPPORT (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>How involved are you in helping with medication? <em class='text-muted'>(Probe: reminding, administering, refilling)</em></li>
-                  <li>What strategies do you use to help ensure medications are taken regularly?</li>
-                  <li>Have there been times when medications were missed? What caused that and how did you handle it?</li>
-                  <li>What challenges have you faced in obtaining medications? <em class='text-muted'>(Probe: cost, availability, distance)</em></li>
-                  <li>How do you know if the medications are working? What changes do you monitor?</li>
-                  <li>Do you accompany the person to medical appointments? How often? What happens during these visits?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>C. HERBAL MEDICINE INVOLVEMENT (8-10 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Does the person you care for use herbal or traditional remedies for blood pressure?</li>
-                  <li>If yes: How did you/they learn about these remedies? Who recommended them?</li>
-                  <li>What is your role in managing herbal treatments? <em class='text-muted'>(Probe: obtaining, preparing, administering)</em></li>
-                  <li>Do they use both hospital and herbal medicines? How do you manage both?</li>
-                  <li>What are your own beliefs about herbal medicine for hypertension? Do you think it works?</li>
-                  <li>Have you observed any positive or negative effects from herbal medicine use?</li>
-                  <li>Have you discussed herbal medicine use with their doctor/nurse? What was the response?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>D. MONITORING & COMMUNICATION (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Do you monitor blood pressure at home? How often? What equipment do you use?</li>
-                  <li>What symptoms or warning signs do you watch for?</li>
-                  <li>How do you communicate with healthcare providers about the person's condition?</li>
-                  <li>What information do you wish healthcare providers would share with you?</li>
-                  <li>Have you received any training or education on hypertension management? Would you like to?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>E. TECHNOLOGY & SUPPORT NEEDS (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Do you use a smartphone? What do you use it for?</li>
-                  <li>Would you be interested in using an app or digital tool to help with caregiving tasks? What features would be helpful?</li>
-                  <li>What kind of support would make caregiving easier for you? <em class='text-muted'>(Probe: information, reminders, communication tools)</em></li>
-                  <li>Do you have support from other family members, friends, or community? How important is this?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>F. REFLECTIONS & RECOMMENDATIONS (3-5 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What has been the most challenging aspect of helping someone manage hypertension?</li>
-                  <li>What has worked well in your experience?</li>
-                  <li>If you could design a perfect support system for caregivers, what would it include?</li>
-                  <li>Is there anything else about your caregiving experience that you'd like to share?</li>
-                </ol>
-              </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 40-50 minutes</p>`,
 
-            policymaker: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-building me-2'></i>Policymaker/Health Administrator Interview Guide</h6>
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>A. BACKGROUND & ROLE (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Tell me about your current role and responsibilities in the health sector.</li>
-                  <li>How long have you been in this position, and what is your background in health policy/administration?</li>
-                  <li>What aspects of your work relate to non-communicable diseases, particularly hypertension?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q5. Digital Health & Future Interests</strong>
+                <p class='small text-muted mb-1'><em>Covers Section F (Digital Health)</em></p>
+                <p>"Finally, if we provided a simple mobile app to track your blood pressure and find the specific treatment that works best for your body, would you be willing to use it? How comfortable are you with using smartphones for health?"</p>
+                <p class='small text-muted'><i class='bi bi-ear me-1'></i><strong>Listen for:</strong> Smartphone ownership, willingness to track data, interest in "Personalized/N-of-1" trials.</p>
               </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>B. HYPERTENSION BURDEN & POLICY CONTEXT (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>From your perspective, what is the current state of hypertension management in your region/Ghana?</li>
-                  <li>What data or information do you have about hypertension prevalence and control in the Eastern Region?</li>
-                  <li>What are the main policy priorities for NCD management currently?</li>
-                  <li>What are the biggest challenges in implementing effective hypertension programs? <em class='text-muted'>(Probe: resources, infrastructure, personnel, awareness)</em></li>
-                  <li>What initiatives or programs are currently in place to address hypertension? How effective are they?</li>
-                  <li>How is medication access and affordability being addressed?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>C. TRADITIONAL/HERBAL MEDICINE POLICY (12-15 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What is the current policy framework regarding traditional and herbal medicine in Ghana?</li>
-                  <li>How does the health system currently interact with traditional/herbal practitioners?</li>
-                  <li>What is your personal view on integrating traditional and conventional medicine for conditions like hypertension?</li>
-                  <li>What are the main benefits you see in integration? What are the main concerns or risks?</li>
-                  <li>What barriers exist to integration at the policy/system level? <em class='text-muted'>(Probe: legal, regulatory, professional, cultural)</em></li>
-                  <li>Are there any existing examples of successful integration (in Ghana or elsewhere) that could inform policy?</li>
-                  <li>What evidence would you need to support policy changes toward integration?</li>
-                  <li>What regulatory framework would be needed to ensure safety and quality in an integrated system?</li>
-                  <li>How would you envision credentialing or licensing of herbal practitioners?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>D. DIGITAL HEALTH & INNOVATION (8-10 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What is the current state of digital health initiatives in your region/nationally?</li>
-                  <li>What policies or strategies exist regarding digital health and telemedicine?</li>
-                  <li>What role do you see for digital health tools in managing hypertension?</li>
-                  <li>What infrastructure or capacity challenges exist for scaling digital health solutions?</li>
-                  <li>How could digital platforms support integration of traditional and conventional approaches?</li>
-                  <li>What would be needed from a policy standpoint to support digital health innovation?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>E. IMPLEMENTATION & SUSTAINABILITY (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>If an integrated hypertension management platform were developed, what would be needed for implementation?</li>
-                  <li>What stakeholders would need to be involved in planning and rollout?</li>
-                  <li>How would you address potential resistance from different professional groups?</li>
-                  <li>What funding mechanisms could support such an intervention?</li>
-                  <li>How would you measure success? What outcomes would be most important?</li>
-                </ol>
-              </div>
-              <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>F. RESEARCH & FUTURE DIRECTIONS (3-5 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What research gaps need to be filled to inform better policy?</li>
-                  <li>What role should academic-policy partnerships play in addressing hypertension?</li>
-                  <li>What is your vision for hypertension management in Ghana in the next 5-10 years?</li>
-                  <li>Any additional thoughts on policy directions for integrative NCD management?</li>
-                </ol>
-              </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 50-60 minutes</p>`,
 
-            researcher: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-mortarboard me-2'></i>Researcher In-Depth Interview Guide</h6>
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`,
+
+            clinician: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-hospital me-2'></i>Clinician Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>Doctors, Nurses, Pharmacists</strong> — 5 questions, ~1 minute each.</p>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>A. BACKGROUND & RESEARCH FOCUS (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>Tell me about your current research position and institution.</li>
-                  <li>What is your area of research specialization?</li>
-                  <li>How does your work relate to hypertension, traditional medicine, or digital health?</li>
-                  <li>Can you describe your most recent or ongoing research projects relevant to these areas?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q1. Current Practice & Control Rates</strong>
+                <p class='small text-muted mb-1'><em>Covers Section B (Current Treatment Practices)</em></p>
+                <p>"In your daily practice, what percentage of your hypertensive patients actually achieve control? What are the primary first-line medications you prescribe, and where do you see the biggest drop-off in patient adherence?"</p>
               </div>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>B. HYPERTENSION RESEARCH LANDSCAPE (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>From your research perspective, what do we know about hypertension burden and management in Ghana?</li>
-                  <li>What are the key knowledge gaps in hypertension research locally? <em class='text-muted'>(Probe: epidemiology, risk factors, treatment outcomes)</em></li>
-                  <li>What have studies shown about medication adherence and barriers to hypertension control in Ghana?</li>
-                  <li>What social, cultural, or economic factors most influence hypertension outcomes in this context?</li>
-                  <li>What methodological challenges exist in conducting hypertension research here?</li>
-                  <li>What research priorities would you identify for improving hypertension management?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q2. Patient Behaviors & Herbal Use</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Observations) & Section D (Herbal Attitudes)</em></p>
+                <p>"How often do patients disclose to you that they are using herbal remedies? Do you actively ask about it, and do you feel you have enough training to advise them safely on potential interactions?"</p>
               </div>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>C. TRADITIONAL/HERBAL MEDICINE RESEARCH (12-15 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What research has been done on traditional/herbal medicine for hypertension in Ghana?</li>
-                  <li>What does the evidence say about efficacy of commonly used herbal remedies?</li>
-                  <li>What is known about safety, herb-drug interactions, and adverse effects?</li>
-                  <li>What are the main challenges in researching traditional medicine? <em class='text-muted'>(Probe: standardization, methodology, funding)</em></li>
-                  <li>How prevalent is concurrent use of conventional and herbal treatments? What does research show about outcomes?</li>
-                  <li>What research would be needed to establish evidence-based integration of approaches?</li>
-                  <li>What ethical considerations are important in traditional medicine research?</li>
-                  <li>How can traditional knowledge be respectfully documented while advancing scientific understanding?</li>
-                  <li>What role should community participation play in this research?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q3. Barriers to Adherence</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Adherence Reasons)</em></p>
+                <p>"Beyond cost, what are the main reasons patients stop taking their hospital medications? Do you find that cultural beliefs or the influence of traditional healers plays a significant role in their decisions?"</p>
               </div>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>D. DIGITAL HEALTH & IMPLEMENTATION SCIENCE (10-12 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What digital health research has been conducted in Ghana, particularly for NCDs?</li>
-                  <li>What does evidence show about effectiveness of mHealth interventions for hypertension?</li>
-                  <li>What are the key considerations for designing digital health solutions for this context? <em class='text-muted'>(Probe: literacy, access, cultural appropriateness)</em></li>
-                  <li>How could digital platforms facilitate research on integrative approaches?</li>
-                  <li>What implementation research is needed to scale effective interventions?</li>
-                  <li>What data systems and infrastructure challenges exist?</li>
-                  <li>How can research better inform policy and practice?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q4. Openness to Integrative Care</strong>
+                <p class='small text-muted mb-1'><em>Covers Section E (Attitudes Toward Integrative Care)</em></p>
+                <p>"If there were a safe, regulated framework, how open would you be to formally collaborating with a trained herbal practitioner? What specific evidence or guidelines would you need to feel comfortable doing so?"</p>
               </div>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>E. RESEARCH DESIGN & METHODS (7-9 mins)</strong>
-                <ol class='ps-3'>
-                  <li>If you were to design a study on integrative hypertension management, what would be your approach?</li>
-                  <li>What outcomes would be most important to measure?</li>
-                  <li>What study designs would be most appropriate and feasible?</li>
-                  <li>How would you address potential biases and confounding factors?</li>
-                  <li>What sample sizes and populations would be needed?</li>
-                  <li>What would be the main ethical considerations?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q5. Digital Health Readiness</strong>
+                <p class='small text-muted mb-1'><em>Covers Section F (Digital Health)</em></p>
+                <p>"We are looking at 'N-of-1' trials—using digital tools to test which specific treatment works best for a single patient. How feasible is it to use digital dashboards in your clinic, and do you think patients would engage with them?"</p>
               </div>
+
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`,
+
+            herbalist: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-flower1 me-2'></i>Herbal Practitioner Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>Herbalists, Traditional Healers</strong> — 5 questions, ~1 minute each.</p>
+
               <div class='guide-section mb-3'>
-                <strong class='d-block mb-2'>F. COLLABORATION & FUTURE DIRECTIONS (5-7 mins)</strong>
-                <ol class='ps-3'>
-                  <li>What opportunities exist for interdisciplinary collaboration in this area?</li>
-                  <li>How can researchers better partner with clinicians, traditional practitioners, and policymakers?</li>
-                  <li>What funding opportunities exist for this type of research?</li>
-                  <li>What do you see as the most promising research directions for the next 5 years?</li>
-                  <li>Would you be interested in participating in research on integrative digital health platforms? What would be your role?</li>
-                  <li>Any final thoughts on research priorities or approaches?</li>
-                </ol>
+                <strong class='d-block mb-2 text-primary'>Q1. Experience & Methods</strong>
+                <p class='small text-muted mb-1'><em>Covers Section A (Background) & Section B (Practice)</em></p>
+                <p>"Can you tell me about your training—was it through family tradition or apprenticeship? How do you diagnose high blood pressure in a patient, and how do you determine the correct dosage for them?"</p>
               </div>
-              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 50-60 minutes</p>`
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q2. Treatments & Preparation</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Treatment Practices)</em></p>
+                <p>"Which specific herbs (like Prekese, Moringa, or others) do you find most effective for blood pressure? How do you typically prepare them—is it mostly powders, teas, or fresh mixtures?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q3. Relationship with Hospitals</strong>
+                <p class='small text-muted mb-1'><em>Covers Section D (Interactions) & Section F (Collaboration)</em></p>
+                <p>"When a patient is also taking hospital medicine, what do you usually advise them to do? Do you ever refer patients to the hospital, and would you be willing to work side-by-side with medical doctors?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q4. Measuring Success</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Monitoring)</em></p>
+                <p>"How do you know if your treatment is working? Do you measure their blood pressure yourself, rely on how they feel, or use other methods to track their improvement?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q5. Interest in Research</strong>
+                <p class='small text-muted mb-1'><em>Covers Section F (Research Interest)</em></p>
+                <p>"Would you be interested in participating in a scientific study to test how well your herbal remedies work compared to, or alongside, hospital medicine? What concerns would you have about sharing your knowledge?"</p>
+              </div>
+
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`,
+
+            caregiver: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-person-hearts me-2'></i>Caregiver Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>Family members supporting patients</strong> — 5 questions, ~1 minute each.</p>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q1. Role & Burden</strong>
+                <p class='small text-muted mb-1'><em>Covers Section A (Demographics) & Section B (Activities)</em></p>
+                <p>"As a caregiver, what are your main daily tasks—is it mostly reminding them to take pills, cooking special meals, or financial support? On a personal level, how much stress or burden does this place on you?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q2. Treatment Management & Trust</strong>
+                <p class='small text-muted mb-1'><em>Covers Section D (Treatment Preferences)</em></p>
+                <p>"Between hospital medications and herbal remedies, which one do you personally trust more for your relative? Do you ever prepare herbal medicines for them, even if they are also seeing a doctor?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q3. Barriers to Care</strong>
+                <p class='small text-muted mb-1'><em>Covers Section E (Healthcare System Interactions)</em></p>
+                <p>"What is the hardest part about getting healthcare for your relative? Is it the cost of transport, long waiting times at the clinic, or the price of the medications themselves?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q4. Integrative Support</strong>
+                <p class='small text-muted mb-1'><em>Covers Section F (Integrative Care Attitudes)</em></p>
+                <p>"If the doctor and a herbalist agreed to work together to treat your relative, would you support that? Do you think using both types of medicine together would be better or more confusing?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q5. Need for Support</strong>
+                <p class='small text-muted mb-1'><em>Covers Section G (Digital/Support)</em></p>
+                <p>"What kind of help do you need most? Would a smartphone app that tracks their blood pressure and medication schedules help you care for them better, or would that just be extra work?"</p>
+              </div>
+
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`,
+
+            policymaker: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-building me-2'></i>Policymaker Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>Health Directors, Administrators</strong> — 5 questions, ~1 minute each.</p>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q1. System Priorities & Gaps</strong>
+                <p class='small text-muted mb-1'><em>Covers Section B (Burden Perspective)</em></p>
+                <p>"Where does hypertension rank in your current public health priorities? In your view, is the biggest gap in the system related to medication supply, staffing, or patient education?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q2. Traditional Medicine Policy</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Traditional Medicine Policy)</em></p>
+                <p>"Ghana has a policy on traditional medicine, but how well is it actually integrated on the ground? Do you believe we should be moving toward stricter regulation or deeper integration of herbalists into primary care?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q3. Feasibility of Integration</strong>
+                <p class='small text-muted mb-1'><em>Covers Section D (Integrative Models)</em></p>
+                <p>"Realistically, what are the biggest regulatory or safety hurdles to implementing a 'Shared Care' model where doctors and herbalists co-manage patients? Is the health service ready for this?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q4. Digital Infrastructure</strong>
+                <p class='small text-muted mb-1'><em>Covers Section E (Digital Health)</em></p>
+                <p>"We are exploring personalized 'N-of-1' trials using mobile health. Do we have the digital infrastructure and policy framework to support such data-driven, personalized interventions in rural areas?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q5. Evidence for Change</strong>
+                <p class='small text-muted mb-1'><em>Covers Section G (Research & Evidence)</em></p>
+                <p>"If we want to change national guidelines to include more integrative or personalized approaches, what kind of evidence do you need to see—cost-effectiveness data, clinical safety trials, or patient satisfaction metrics?"</p>
+              </div>
+
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`,
+
+            researcher: `<h6 class='guide-title text-primary mb-3'><i class='bi bi-mortarboard me-2'></i>Researcher Interview Guide</h6>
+              <p class='alert alert-info small mb-3'><i class='bi bi-clock me-1'></i><strong>Academics, Scientists</strong> — 5 questions, ~1 minute each.</p>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q1. Research Gaps</strong>
+                <p class='small text-muted mb-1'><em>Covers Section B (Research Landscape)</em></p>
+                <p>"From your perspective, what is the single biggest missing piece of evidence regarding hypertension management in Ghana? Is it lack of data on herbal efficacy or lack of implementation science on delivery?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q2. Herbal Research Challenges</strong>
+                <p class='small text-muted mb-1'><em>Covers Section C (Traditional Med Research)</em></p>
+                <p>"Why is it so difficult to get high-quality evidence on herbal medicines here? Is the main bottleneck funding, lack of standardization of the products, or difficulty in recruiting patients?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q3. N-of-1 Methodologies</strong>
+                <p class='small text-muted mb-1'><em>Covers Section D (N-of-1 Trials)</em></p>
+                <p>"Do you think 'N-of-1' trials (single-patient, multi-crossover trials) are a viable methodology for Ghana? What are the statistical or logistical barriers to running these compared to standard RCTs?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q4. Digital Data Validity</strong>
+                <p class='small text-muted mb-1'><em>Covers Section E (Digital Health)</em></p>
+                <p>"Can we trust data collected via mobile apps in this population? What are the specific challenges with digital literacy or data privacy that might compromise a study like this?"</p>
+              </div>
+
+              <div class='guide-section mb-3'>
+                <strong class='d-block mb-2 text-primary'>Q5. Collaboration Models</strong>
+                <p class='small text-muted mb-1'><em>Covers Section F (Collaboration)</em></p>
+                <p>"Who needs to be at the table to make integrative research successful? Do we need to include traditional healers as co-investigators, and how do we bridge the gap between academic science and traditional knowledge?"</p>
+              </div>
+
+              <p class='text-muted small mt-3'><i class='bi bi-clock me-1'></i>Estimated time: 5 minutes</p>`
           };
           App.$('idiGuide').innerHTML = guides[type] || "<p class='text-muted'>Please select a participant to load the interview guide.</p>";
         },
@@ -3092,17 +2884,27 @@
 
         save: (mode) => {
           const notes = mode === 'idi' ? App.$('idiNotes').value : App.$('fgdNotes').value;
-          const pid = mode === 'idi' ? App.$('idiParticipantSelect').value : "FGD_GROUP";
+          let pid = mode === 'idi' ? App.$('idiParticipantSelect').value : 'FGD';
 
-          if (!notes && !pid) return alert("Select participant and add notes.");
+          if (!notes && !pid) return alert('Select participant and add notes.');
 
           // Build consistent naming: participantID_sitename_date
-          const participant = App.State.participants.find(p => p.id === pid);
-          const siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+          let siteName = 'UNKNOWN';
           const dateStr = new Date().toISOString().split('T')[0];
 
+          if (mode === 'idi') {
+            const participant = App.State.participants.find(p => p.id === pid);
+            siteName = participant && participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 25) : 'UNKNOWN';
+          } else {
+            // FGD: use group name if provided
+            const fgdNameEl = App.$('fgdName');
+            if (fgdNameEl && fgdNameEl.value.trim()) {
+              pid = 'FGD_' + fgdNameEl.value.trim().replace(/[^a-zA-Z0-9]/g, '_');
+            }
+          }
+
           const record = {
-            id: `${pid}_${siteName}_${dateStr}_INT`,
+            id: `${pid}_${siteName}_${dateStr}`,
             mode: mode,
             participantId: pid,
             notes: notes,
@@ -3123,11 +2925,36 @@
           if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
             UhasIDB.put('interviews', record).then(() => {
               console.log('✅ Interview saved to IDB');
-            }).catch(err => console.error('❌ Failed to save interview to IDB', err));
+            }).catch(err => console.error('Failed to save interview to IDB', err));
           }
 
           App.Storage.save();
-          App.Toast("Interview Saved!");
+
+          // === AUTO-DOWNLOAD interview JSON ===
+          try {
+            const jsonFilename = `${record.id}.json`;
+            const jsonBlob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+            const jsonUrl = URL.createObjectURL(jsonBlob);
+            const dlLink = document.createElement('a');
+            dlLink.href = jsonUrl;
+            dlLink.download = jsonFilename;
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            document.body.removeChild(dlLink);
+            URL.revokeObjectURL(jsonUrl);
+            console.log('✅ Interview auto-downloaded:', jsonFilename);
+          } catch (dlErr) {
+            console.warn('Auto-download failed:', dlErr);
+          }
+
+          // === AUTO-SYNC to Firebase ===
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized && navigator.onLine) {
+            FirebaseSync.uploadSingleRecord('interviews', record).then(ok => {
+              if (ok) console.log('✅ Interview synced to Firebase');
+            });
+          }
+
+          App.Toast("Interview Saved & Downloaded!");
         },
 
         complete: (mode) => {
@@ -3297,6 +3124,7 @@
         saveRecording: async (mode) => {
           const actualMime = App.Audio.mimeType || 'audio/webm';
           const blob = new Blob(App.Audio.chunks, { type: actualMime });
+          const ext = actualMime.includes('mp4') ? 'm4a' : 'webm';
 
           const player = App.$('playerFloat');
           const statusEl = App.$('statusFloat');
@@ -3308,112 +3136,114 @@
             const idiTab = App.$('tab-idi');
             actualMode = idiTab && idiTab.classList.contains('active') ? 'idi' : 'fgd';
           }
-          
+
           const participantId = actualMode === 'idi' ? App.$('idiParticipantSelect').value : 'FGD';
 
-          // Get participant details for naming
+          // Build filename: participantID_sitename_date
           let site = 'UNKNOWN';
-          let participantName = participantId;
+          let participantName = participantId || 'UNKNOWN';
           if (actualMode === 'idi' && participantId) {
             const participant = App.State.participants.find(p => p.id === participantId);
             if (participant) {
-              site = participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 'UNKNOWN';
+              site = participant.site ? participant.site.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 25) : 'UNKNOWN';
               participantName = participant.id;
             }
           } else if (actualMode === 'fgd') {
-            participantName = 'FGD_GROUP';
+            participantName = 'FGD';
+            // Use fgdName if available
+            const fgdNameEl = App.$('fgdName');
+            if (fgdNameEl && fgdNameEl.value.trim()) {
+              participantName = 'FGD_' + fgdNameEl.value.trim().replace(/[^a-zA-Z0-9]/g, '_');
+            }
           }
 
           const dateStr = new Date().toISOString().split('T')[0];
-          const id = `${participantName}_${site}_${dateStr}_AUDIO`;
+          const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '');
+          const id = `${participantName}_${site}_${dateStr}`;
+          const uniqueId = `${id}_${timeStr}`;
 
-          // Setup audio player with proper event handlers
+          // Setup audio player
           player.style.display = 'block';
           player.controls = true;
           player.preload = 'metadata';
-
-          // Prepare the blob URL for playback
           const url = URL.createObjectURL(blob);
           player.src = url;
           player.type = actualMime;
 
-          // Set up event handlers for playback feedback
-          player.oncanplay = () => {
-            console.log('✅ Audio ready to play');
-            statusEl.innerHTML = '<span class="text-success">Saved! Ready to play</span>';
-          };
+          player.oncanplay = () => { statusEl.innerHTML = '<span class="text-success">✅ Saved & Downloaded</span>'; };
+          player.onerror = () => { statusEl.innerHTML = '<span class="text-warning">Saved (playback N/A)</span>'; };
 
-          player.onerror = (e) => {
-            console.error('Audio playback error:', e);
-            statusEl.innerHTML = '<span class="text-warning">Saved (playback unavailable)</span>';
-          };
-
-          player.onplay = () => {
-            statusEl.innerHTML = '<span class="text-success">▶ Playing</span>';
-          };
-
-          player.onpause = () => {
-            statusEl.innerHTML = '<span class="text-success">Saved! ⏸ Paused</span>';
-          };
-
-          // Store blob in IndexedDB for persistence
+          // === AUTO-DOWNLOAD audio to device ===
           try {
-            await App.AudioDB.saveBlob(id, blob, {
-              mode: actualMode,
-              participantId,
-              date: new Date().toISOString()
-            });
-            console.log('✅ Audio saved to IndexedDB:', id);
-          } catch (err) {
-            console.error('Failed to save audio to IndexedDB:', err);
+            const downloadUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `${uniqueId}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(downloadUrl);
+            console.log('✅ Audio auto-downloaded:', `${uniqueId}.${ext}`);
+          } catch (dlErr) {
+            console.warn('Auto-download failed:', dlErr);
           }
 
-          // Also keep in memory for immediate access
-          App.State.audioBlobs[id] = blob;
+          // Store in IndexedDB
+          const audioMeta = { mode: actualMode, participantId, date: new Date().toISOString() };
+          try {
+            await App.AudioDB.saveBlob(uniqueId, blob, audioMeta);
+          } catch (err) {
+            console.error('IndexedDB save failed:', err);
+          }
+
+          App.State.audioBlobs[uniqueId] = blob;
           const recordingData = {
-            id: id,
+            id: uniqueId,
             mode: actualMode,
             mimeType: actualMime,
             date: new Date().toISOString(),
-            participantId: participantId
+            participantId: participantId,
+            site: site,
+            filename: `${uniqueId}.${ext}`
           };
           App.State.audioRecordings.push(recordingData);
           App.Storage.save();
 
-          // Save to unified database for synchronization
+          // Save to unified DB
           try {
             if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
               await UhasIDB.put('audioRecordings', {
-                id: id,
-                module: 'toolkit-a',
-                type: 'audio-recording',
-                participantId: participantId,
-                recordingId: id,
-                mode: actualMode,
-                mimeType: actualMime,
-                date: new Date().toISOString(),
-                status: 'completed',
-                hasAudioBlob: true
+                id: uniqueId, module: 'toolkit-a', type: 'audio-recording',
+                participantId, recordingId: uniqueId, mode: actualMode,
+                mimeType: actualMime, site, filename: `${uniqueId}.${ext}`,
+                date: new Date().toISOString(), status: 'completed', hasAudioBlob: true
               });
-              console.log('✅ Audio metadata saved to unified database');
             }
-          } catch (err) {
-            console.error('Failed to save to unified database:', err);
-          }
+          } catch (err) { console.error('Unified DB save failed:', err); }
 
-          App.$('statusFloat').textContent = "Saved!";
-
-          // Show download & share buttons
-          App.Audio.lastRecordingId = id;
+          statusEl.innerHTML = '<span class="text-success">✅ Saved & Downloaded!</span>';
+          App.Audio.lastRecordingId = uniqueId;
           App.Audio.lastRecordingMime = actualMime;
           const actionsEl = App.$('floatingRecorderActions');
           if (actionsEl) actionsEl.style.display = 'flex';
 
-          App.Toast("Audio Saved! Download or share via WhatsApp below.");
+          App.Toast('✅ Audio saved & downloaded!');
 
-          // Attempt background upload
-          if (navigator.onLine) {
-            App.Data.uploadAudio(id, true); // true = silent mode
+          // === AUTO-SYNC to Firebase ===
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized && navigator.onLine) {
+            statusEl.innerHTML = '<span class="text-info">☁️ Uploading to cloud...</span>';
+            try {
+              const uploaded = await FirebaseSync.uploadSingleAudio(uniqueId, blob, audioMeta);
+              if (uploaded) {
+                statusEl.innerHTML = '<span class="text-success">✅ Saved & Synced to Cloud!</span>';
+                App.Toast('✅ Audio synced to Firebase!');
+              } else {
+                statusEl.innerHTML = '<span class="text-success">✅ Saved! Will sync later.</span>';
+              }
+            } catch (syncErr) {
+              console.warn('Firebase upload queued:', syncErr);
+              statusEl.innerHTML = '<span class="text-success">✅ Saved! Will sync when online.</span>';
+            }
           }
         }
       },
@@ -3880,17 +3710,16 @@
             const id = row.id || row.localId;
             const type = App.Data.currentTable === 'participants' ? row.type : row.mode;
             const date = new Date(row.date || row.createdAt).toLocaleDateString();
-            // Check sync status if we had access to it, simplified for now
-            const isSynced = false; // logic to check sync status from db metadata?
+            const isSynced = row.synced === true;
 
             return `
                     <tr>
-                        <td>${id}</td>
-                        <td><span class="badge bg-secondary">${type}</span></td>
+                        <td style="font-family:monospace;font-size:0.8rem;">${id}</td>
+                        <td><span class="badge bg-secondary">${type || '-'}</span></td>
                         <td>${date}</td>
-                        <td>${isSynced ? '<span class="badge bg-success">Synced</span>' : '<span class="badge bg-warning text-dark">Local</span>'}</td>
+                        <td>${isSynced ? '<span class="badge bg-success"><i class="bi bi-cloud-check"></i> Synced</span>' : '<span class="badge bg-warning text-dark"><i class="bi bi-phone"></i> Local</span>'}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="alert('Details view coming soon')"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="App.Data.downloadRecord('${id}', '${App.Data.currentTable}')"><i class="bi bi-download"></i></button>
                         </td>
                     </tr>
                  `;
@@ -3898,7 +3727,11 @@
         },
 
         syncNow: async () => {
-          App.Toast("📱 All data is stored locally on your device. Export and send to WhatsApp to share.");
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized) {
+            await FirebaseSync.manualSync();
+          } else {
+            App.Toast('Firebase not connected - data stored locally');
+          }
         },
 
         renderAudioList: async () => {
@@ -3945,6 +3778,33 @@
               </div>
             </div>`;
           }).join('');
+        },
+
+        // Download a single data record as JSON
+        downloadRecord: async (id, type) => {
+          try {
+            let record;
+            if (type === 'participants') {
+              record = App.State.participants.find(p => p.id === id) || await UhasIDB.get('participants', id);
+            } else {
+              record = App.State.interviews.find(i => i.id === id) || await UhasIDB.get('interviews', id);
+            }
+            if (!record) { App.Toast('Record not found'); return; }
+
+            const jsonBlob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(jsonBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            App.Toast(`Downloaded: ${id}.json`);
+          } catch (err) {
+            console.error('Download failed:', err);
+            App.Toast('Download failed');
+          }
         },
 
         downloadAudio: async (id) => {
@@ -4015,67 +3875,58 @@
 
         uploadAudio: async (id, silent = false) => {
           if (!navigator.onLine) {
-            if (!silent) App.Toast('You are offline. Try again when connected.');
+            if (!silent) App.Toast('Offline - will sync when connected');
             return;
           }
 
-          // Get blob from memory or IndexedDB
           let blob = App.State.audioBlobs[id];
           if (!blob) {
             try {
               const record = await App.AudioDB.getBlob(id);
               if (record) blob = record.blob;
-            } catch (err) {
-              console.error('Failed to get audio from IndexedDB:', err);
-            }
+            } catch (err) { console.error(err); }
           }
 
           if (!blob) {
-            if (!silent) alert("Audio file not available.");
+            if (!silent) App.Toast('Audio not available');
             return;
           }
 
-          try {
-            if (!silent) App.Toast('📱 Data stored locally. Export and send via WhatsApp.');
-            // All data is stored locally in IndexedDB
-            // Users can export audio and send manually
-          } catch (error) {
-            console.error('Error:', error);
-            if (!silent) App.Toast('Data is stored locally on your device.');
+          // Upload to Firebase
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized) {
+            try {
+              if (!silent) App.Toast('Uploading to cloud...');
+              const rec = App.State.audioRecordings.find(r => r.id === id);
+              const meta = { participantId: rec?.participantId || '', mode: rec?.mode || '' };
+              const ok = await FirebaseSync.uploadSingleAudio(id, blob, meta);
+              if (ok) {
+                if (!silent) App.Toast('✅ Audio synced to cloud!');
+                App.Data.renderAudioList();
+              } else {
+                if (!silent) App.Toast('Upload queued for later');
+              }
+            } catch (err) {
+              if (!silent) App.Toast('Upload failed - will retry later');
+            }
+          } else {
+            if (!silent) App.Toast('Firebase not ready - will sync automatically');
           }
         },
 
         uploadAllAudio: async () => {
           if (!navigator.onLine) {
-            App.Toast('You are offline. Try again when connected.');
+            App.Toast('Offline - will sync when connected');
             return;
           }
 
-          const storedBlobs = await App.AudioDB.getAllBlobs();
-          const unsynced = storedBlobs.filter(b => !b.synced);
-
-          if (unsynced.length === 0) {
-            App.Toast('All audio files already synced!');
-            return;
+          if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialized) {
+            App.Toast('Syncing all data & audio...');
+            await FirebaseSync.syncAll();
+            App.Data.renderAudioList();
+            App.Toast('✅ Sync complete!');
+          } else {
+            App.Toast('Firebase not ready');
           }
-
-          App.Toast(`Uploading ${unsynced.length} audio file(s)...`);
-
-          let success = 0;
-          let failed = 0;
-
-          for (const record of unsynced) {
-            try {
-              await App.Data.uploadAudio(record.id);
-              success++;
-            } catch (err) {
-              failed++;
-              console.error(`Failed to upload ${record.id}:`, err);
-            }
-          }
-
-          App.Toast(`Uploaded ${success}/${unsynced.length} files`);
-          App.Data.renderAudioList();
         },
 
         clearAll: () => {
@@ -4188,12 +4039,20 @@
     console.log('✅ UHAS Toolkit A - Complete Offline Mode');
   </script>
 
+  <!-- Firebase SDK (compat for CDN usage) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
   <!-- IndexedDB & Import/Export Management -->
   <script src="./assets/js/idb-manager.js"></script>
   <script src="./assets/js/import-export.js"></script>
 
   <!-- Core Scripts -->
   <script src="./assets/js/participant.js"></script>
+
+  <!-- Firebase Sync Module -->
+  <script src="./assets/js/firebase-sync.js"></script>
   
   <!-- Main App Script -->
   <script src="./app.js"></script>
