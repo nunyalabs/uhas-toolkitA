@@ -160,10 +160,16 @@ const FirebaseSync = {
           await UhasIDB.put(storeName, record);
           result.synced++;
         } catch (err) {
+          console.error(`[FirebaseSync] Failed to sync ${storeName}/${record.id}:`, err.code || err.message);
+          if (err.code === 'permission-denied') {
+            console.error('[FirebaseSync] ⚠️ PERMISSION DENIED - Deploy Firestore rules in Firebase Console!');
+            if (typeof App !== 'undefined') App.Toast('⚠️ Firebase rules not deployed! Check console.');
+          }
           result.errors++;
         }
       }
     } catch (error) {
+      console.error(`[FirebaseSync] syncStore(${storeName}) failed:`, error.code || error.message);
       result.errors++;
     }
     return result;
@@ -188,10 +194,16 @@ const FirebaseSync = {
             result.synced++;
           }
         } catch (err) {
+          console.error(`[FirebaseSync] Audio upload failed for ${record.id}:`, err.code || err.message);
+          if (err.code === 'storage/unauthorized') {
+            console.error('[FirebaseSync] ⚠️ STORAGE UNAUTHORIZED - Deploy Storage rules in Firebase Console!');
+            if (typeof App !== 'undefined') App.Toast('⚠️ Firebase Storage rules not deployed!');
+          }
           result.errors++;
         }
       }
     } catch (error) {
+      console.error('[FirebaseSync] syncAudioBlobs failed:', error.code || error.message);
       result.errors++;
     }
     return result;
@@ -264,10 +276,54 @@ const FirebaseSync = {
         record.syncedAt = new Date().toISOString();
         await UhasIDB.put(storeName, record);
       }
+      console.log(`✅ Record synced: ${storeName}/${record.id}`);
       return true;
     } catch (err) {
+      console.error(`[FirebaseSync] uploadSingleRecord failed:`, err.code || err.message);
+      if (err.code === 'permission-denied' && typeof App !== 'undefined') {
+        App.Toast('⚠️ Firebase rules not deployed! Check Firebase Console.');
+      }
       return false;
     }
+  },
+
+  // Reset all synced flags so records retry upload (use after deploying rules)
+  resetSyncFlags: async function () {
+    let reset = 0;
+    try {
+      if (typeof UhasIDB !== 'undefined' && UhasIDB.db) {
+        for (const store of ['participants', 'interviews', 'audioRecordings']) {
+          const all = await UhasIDB.getAll(store);
+          for (const r of all) {
+            if (r.synced) {
+              r.synced = false;
+              delete r.syncedAt;
+              await UhasIDB.put(store, r);
+              reset++;
+            }
+          }
+        }
+      }
+      if (typeof App !== 'undefined' && App.AudioDB && App.AudioDB.db) {
+        const blobs = await App.AudioDB.getAllBlobs();
+        for (const b of blobs) {
+          if (b.synced) {
+            b.synced = false;
+            delete b.syncedAt;
+            const tx = App.AudioDB.db.transaction('audioBlobs', 'readwrite');
+            tx.objectStore('audioBlobs').put(b);
+            reset++;
+          }
+        }
+      }
+      console.log(`✅ Reset ${reset} sync flags — will retry on next sync`);
+      if (typeof App !== 'undefined') App.Toast(`Reset ${reset} records — syncing now...`);
+      // Trigger immediate sync
+      setTimeout(() => this.syncAll(), 500);
+    } catch (err) {
+      console.error('Reset sync flags failed:', err);
+    }
+    return reset;
   },
 
   manualSync: async function () {
@@ -432,9 +488,18 @@ const FirebaseSync = {
               ${!navigator.onLine ? 'disabled' : ''} style="width:100%;padding:14px;font-size:1.05rem;font-weight:600;border-radius:12px;">
         <i class="bi bi-cloud-upload"></i> Sync Now
       </button>
+      <button class="btn btn-outline" onclick="FirebaseSync.resetSyncFlags();document.getElementById('firebaseSyncModal').style.display='none';"
+              style="width:100%;padding:12px;font-size:0.95rem;font-weight:600;border-radius:12px;margin-top:8px;">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset & Retry All
+      </button>
       <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:10px;text-align:center;">
         Auto-syncs every ${this.AUTO_SYNC_MS / 1000}s when online
       </p>
+      <div style="margin-top:12px;padding:10px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border);font-size:0.75rem;color:var(--text-secondary);">
+        <strong style="color:var(--warning);">\u26a0\ufe0f If sync fails:</strong> Deploy rules in Firebase Console:<br>
+        <strong>Firestore</strong> \u2192 Rules \u2192 paste from <code>firestore.rules</code><br>
+        <strong>Storage</strong> \u2192 Rules \u2192 paste from <code>storage.rules</code>
+      </div>
     `;
     modal.style.display = 'flex';
   }
