@@ -13,7 +13,7 @@ const FirebaseSync = {
   syncInterval: null,
   AUTO_SYNC_MS: 20000,
 
-  // Config loaded from firebase-config.js (git-ignored)
+  // Config loaded from firebase-config.js
   config: window.FIREBASE_CONFIG || null,
 
   /*

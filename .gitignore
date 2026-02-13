@@ -25,8 +25,7 @@ out/
 .env
 .env.local
 
-# Firebase config (contains API keys – keep local only)
-firebase-config.js
+
 
 # Logs
 *.log
