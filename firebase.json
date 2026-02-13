@@ -3,7 +3,7 @@
     "rules": "firestore.rules"
   },
   "storage": {
-    "rules": "storage.rules"
-  },
-  "hosting": null
+    "rules": "storage.rules",
+    "bucket": "uhas-study.firebasestorage.app"
+  }
 }
