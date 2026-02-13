@@ -13,14 +13,8 @@ const FirebaseSync = {
   syncInterval: null,
   AUTO_SYNC_MS: 20000,
 
-  config: {
-    apiKey: "AIzaSyCAv32vE8dduCOstrZiuFUHHdiz3pQYMXs",
-    authDomain: "uhas-study.firebaseapp.com",
-    projectId: "uhas-study",
-    storageBucket: "uhas-study.firebasestorage.app",
-    messagingSenderId: "952946475862",
-    appId: "1:952946475862:web:70f90e3e7f96407c728cf7"
-  },
+  // Config loaded from firebase-config.js (git-ignored)
+  config: window.FIREBASE_CONFIG || null,
 
   /*
    * ============================================
@@ -51,6 +45,11 @@ const FirebaseSync = {
 
   init: async function () {
     try {
+      if (!this.config) {
+        console.warn('Firebase config not found – create firebase-config.js (see README)');
+        return false;
+      }
+
       if (typeof firebase === 'undefined') {
         console.warn('Firebase SDK not loaded');
         return false;
